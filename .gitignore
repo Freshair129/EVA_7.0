@@ -1,0 +1,99 @@
+# EVA 7.0 - Git Ignore
+
+# Environment Variables (CRITICAL: Do not commit API keys!)
+.env
+.env.local
+.env.*.local
+
+# Personal Data (CRITICAL: Do not commit personal information!)
+# Boss Soul & Genesis (contains personal mental health & relationship data)
+EVA_Soul/*.json
+!EVA_Soul/*_template.json
+EVA_Soul/Boss_Soul_Layers_v5.md
+EVA_Soul/Genesis_Memories.json
+EVA_Persona.md
+
+# Personal Memory (contains conversation history)
+01_Episodic_memory/*.json
+!01_Episodic_memory/Episodic_memory_template.json
+02_Semantic_memory/*.json
+!02_Semantic_memory/Semantic_memory_template.json
+03_Sensory_memory/*.json
+!03_Sensory_memory/Sensory_memory_template.json
+04_Session_Memory/*
+!04_Session_Memory/.gitkeep
+07_User_block/*.json
+!07_User_block/User_block_template.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+ESS_logs/*/
+*.jsonl
+
+# MSP Temporary Buffers
+Buffer/instance_*/
+
+# MSP Backups (optional - comment out if you want to keep backups in git)
+Backups/
+
+# Test artifacts
+test_msp_base/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# Session files (optional)
+Session_memory_*.json

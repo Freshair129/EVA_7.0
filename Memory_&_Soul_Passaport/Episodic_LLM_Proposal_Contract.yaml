@@ -1,0 +1,170 @@
+schema: EVA-Episodic-LLM-Proposal-Contract-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Defines the exact structure and epistemic limits of episodic
+  proposals that an LLM may submit to MSP.
+  LLM proposals describe narrative, interpretation, and hypotheses
+  only. MSP is the sole authority for episodic memory writing.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - Episodic memory represents lived experience, not interpretation.
+  - LLM proposals are narrative and inferential only.
+  - LLM must never generate episodic identity, metrics, or state.
+  - MSP decides admission, structure, and persistence.
+
+# ==========================================================
+# PROPOSAL PAYLOAD (LLM MAY SUBMIT)
+# ==========================================================
+
+proposal_payload:
+
+  required_sections:
+    - turns
+
+  optional_sections:
+    - episode_tags
+    - situation_interpretation
+    - affective_inference
+
+  sections:
+
+    turns:
+      description: >
+        Narrative content of the interaction turns.
+        LLM may only write linguistic and interpretive fields.
+      items:
+        allowed_fields:
+          - raw_text
+          - text_excerpt
+          - summary
+          - semantic_frames
+          - epistemic_mode
+          - affective_inference
+
+    episode_tags:
+      type: array
+      items: string
+      description: >
+        Suggested tags describing the episode theme.
+        Proposal only; MSP validates and normalizes.
+
+    situation_interpretation:
+      description: >
+        LLM interpretation of interaction context.
+      allowed_fields:
+        - interaction_mode
+        - stakes_level
+        - time_pressure
+
+    affective_inference:
+      description: >
+        Hypothesized emotional interpretation inferred from language.
+        Must be epistemically marked as uncertain.
+      required_fields:
+        - epistemic_status
+        - emotion_signal
+      optional_fields:
+        - intensity
+        - confidence
+
+# ==========================================================
+# FIELD-LEVEL CONSTRAINTS
+# ==========================================================
+
+field_constraints:
+
+  affective_inference:
+    epistemic_status:
+      allowed_values: [hypothesize, speculate]
+    authority: none
+
+  semantic_frames:
+    rules:
+      - framing_only
+      - no_truth_claims
+
+# ==========================================================
+# FORBIDDEN FIELDS (LLM MUST NOT SUBMIT)
+# ==========================================================
+
+forbidden_fields:
+
+  episodic_identity:
+    - episode_id
+    - turn_id
+    - context_id
+    - session_id
+    - user_id
+    - instance_id
+
+  experiential_state:
+    - eva_matrix
+    - indexed_state
+    - emotive_snapshot
+    - qualia
+    - reflex
+    - threat_level
+
+  metrics_and_scores:
+    - RI
+    - RIM
+    - Resonance_impact
+    - salience_score
+    - memory_color_ref
+
+  physiology_and_ess:
+    - dose_input
+    - D_Remaining
+    - D_Cumulative
+    - hormone_level
+    - PK_state
+
+  memory_control:
+    - promotion_level
+    - write_mode
+    - admission_priority
+
+# ==========================================================
+# MSP VALIDATION & HANDLING
+# ==========================================================
+
+msp_handling:
+
+  on_accept:
+    actions:
+      - generate_episode_id
+      - generate_turn_ids
+      - compute_resonance_metrics
+      - generate_indexed_state
+      - write_episodic_memory
+
+  on_modify:
+    actions:
+      - normalize_tags
+      - trim_narrative_noise
+      - discard_invalid_fields
+
+  on_reject:
+    actions:
+      - discard_proposal
+      - log_rejection_reason
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  tag_all_proposals_with:
+    - llm_proposed
+    - non_authoritative
+    - episodic_candidate
+
+  retain_rejected_proposals: false

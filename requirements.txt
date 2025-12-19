@@ -1,0 +1,17 @@
+# EVA 7.0 Dependencies
+# Python 3.9+ required
+
+# LLM Integration
+google-generativeai>=0.3.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Numerical Computing
+numpy>=1.24.0
+
+# Data Handling (for YAML configs)
+pyyaml>=6.0
+
+# Optional: For better JSON handling
+# jsonschema>=4.0.0

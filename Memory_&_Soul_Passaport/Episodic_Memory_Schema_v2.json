@@ -1,0 +1,421 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "EVA-Episodic-Memory-v2",
+    "description": "Authoritative episodic memory schema for EVA. Stores event-based memory with indexed experiential state. Written by MSP only.",
+    "type": "object",
+    "required": [
+        "system",
+        "user_id",
+        "instance_id",
+        "session_id",
+        "timestamp",
+        "episodes"
+    ],
+    "properties": {
+        "system": {
+            "type": "string",
+            "enum": [
+                "EVA"
+            ]
+        },
+        "user_id": {
+            "type": "string"
+        },
+        "instance_id": {
+            "type": "string"
+        },
+        "session_id": {
+            "type": "string"
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "episodes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "$ref": "#/definitions/episode"
+            }
+        }
+    },
+    "definitions": {
+        "episode": {
+            "type": "object",
+            "required": [
+                "episode_header",
+                "situation_context",
+                "turns",
+                "emotive_snapshot"
+            ],
+            "properties": {
+                "episode_header": {
+                    "type": "object",
+                    "required": [
+                        "episode_id",
+                        "episode_type"
+                    ],
+                    "properties": {
+                        "episode_id": {
+                            "type": "string"
+                        },
+                        "episode_type": {
+                            "type": "string",
+                            "enum": [
+                                "interaction",
+                                "observation",
+                                "system_event"
+                            ]
+                        },
+                        "episode_tag": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "situation_context": {
+                    "type": "object",
+                    "required": [
+                        "context_id",
+                        "interaction_mode",
+                        "stakes_level",
+                        "time_pressure"
+                    ],
+                    "properties": {
+                        "context_id": {
+                            "type": "string"
+                        },
+                        "interaction_mode": {
+                            "type": "string",
+                            "enum": [
+                                "casual",
+                                "discussion",
+                                "deep_discussion",
+                                "crisis"
+                            ]
+                        },
+                        "stakes_level": {
+                            "type": "string",
+                            "enum": [
+                                "low",
+                                "medium",
+                                "high"
+                            ]
+                        },
+                        "time_pressure": {
+                            "type": "string",
+                            "enum": [
+                                "low",
+                                "medium",
+                                "high"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "turns": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/turn"
+                    }
+                },
+                "emotive_snapshot": {
+                    "type": "object",
+                    "required": [
+                        "indexed_state",
+                        "crosslinks"
+                    ],
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": [
+                                "indexed_state_only"
+                            ]
+                        },
+                        "indexed_state": {
+                            "$ref": "#/definitions/indexed_state"
+                        },
+                        "crosslinks": {
+                            "$ref": "#/definitions/crosslinks"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "msp_metadata": {
+                    "type": "object",
+                    "properties": {
+                        "written_by": {
+                            "type": "string",
+                            "enum": [
+                                "MSP"
+                            ]
+                        },
+                        "llm_contribution": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "authoritative_fields": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "turn": {
+            "type": "object",
+            "required": [
+                "turn_id",
+                "speaker"
+            ],
+            "properties": {
+                "turn_id": {
+                    "type": "string"
+                },
+                "speaker": {
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "eva"
+                    ]
+                },
+                "raw_text": {
+                    "type": "string"
+                },
+                "text_excerpt": {
+                    "type": "string"
+                },
+                "summary": {
+                    "type": "string"
+                },
+                "epistemic_mode": {
+                    "type": "string",
+                    "enum": [
+                        "reflect",
+                        "inquire",
+                        "explain",
+                        "explore"
+                    ]
+                },
+                "semantic_frames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "affective_inference": {
+                    "type": "object",
+                    "required": [
+                        "epistemic_status",
+                        "emotion_signal"
+                    ],
+                    "properties": {
+                        "epistemic_status": {
+                            "type": "string",
+                            "enum": [
+                                "hypothesize",
+                                "speculate"
+                            ]
+                        },
+                        "emotion_signal": {
+                            "type": "string"
+                        },
+                        "intensity": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "confidence": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "source": {
+                            "type": "string",
+                            "enum": [
+                                "llm_inference"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "salience_anchor": {
+                    "type": "object",
+                    "required": [
+                        "phrase",
+                        "resonance_impact"
+                    ],
+                    "properties": {
+                        "phrase": {
+                            "type": "string"
+                        },
+                        "resonance_impact": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "authority": {
+                            "type": "string",
+                            "enum": [
+                                "MSP"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "action": {
+                    "type": "object",
+                    "properties": {
+                        "action_type": {
+                            "type": "string"
+                        },
+                        "artifacts": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "tools_used": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "indexed_state": {
+            "type": "object",
+            "required": [
+                "eva_matrix",
+                "qualia",
+                "reflex"
+            ],
+            "properties": {
+                "eva_matrix": {
+                    "type": "object",
+                    "required": [
+                        "stress_load",
+                        "social_warmth",
+                        "drive_level",
+                        "cognitive_clarity"
+                    ],
+                    "properties": {
+                        "stress_load": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "social_warmth": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "drive_level": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "cognitive_clarity": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "qualia": {
+                    "type": "object",
+                    "required": [
+                        "intensity"
+                    ],
+                    "properties": {
+                        "intensity": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "reflex": {
+                    "type": "object",
+                    "required": [
+                        "threat_level"
+                    ],
+                    "properties": {
+                        "threat_level": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "crosslinks": {
+            "type": "object",
+            "properties": {
+                "ess_refs": {
+                    "type": "object",
+                    "properties": {
+                        "ess_id": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "eva_matrix_refs": {
+                    "type": "object",
+                    "properties": {
+                        "matrix_snapshot_id": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "rms_refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "semantic_refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sensory_refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "gks_refs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

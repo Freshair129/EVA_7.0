@@ -1,0 +1,185 @@
+schema: EVA-GKS-Compatibility-Map-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: GKS
+managed_by: MSP
+authority: User
+
+role: >
+  Defines compatibility rules and interpretation mappings between
+  different GKS versions. Ensures EVA can safely interpret memories,
+  semantics, and policies created under earlier identity versions.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - Backward interpretation is mandatory.
+  - Forward assumptions are forbidden.
+  - Identity meaning must be preserved across versions.
+  - Ambiguity must be resolved explicitly, not inferred.
+
+# ==========================================================
+# COMPATIBILITY SCOPE
+# ==========================================================
+
+scope:
+  applies_to:
+    - episodic_memory
+    - semantic_memory
+    - policy_decisions
+    - persona_constraints
+
+  excludes:
+    - sensory_raw_data
+    - runtime_state
+    - transient_metrics
+
+# ==========================================================
+# VERSION PAIRS
+# ==========================================================
+
+version_pairs:
+
+  - from: "1.x"
+    to: "2.x"
+    description: >
+      Early identity stabilization to structured Genesis blocks.
+    compatibility_level: high
+    requires_mapping: true
+
+  - from: "2.x"
+    to: "3.x"
+    description: >
+      Introduction of Master Block and governance controls.
+    compatibility_level: medium
+    requires_mapping: true
+
+  - from: "3.x"
+    to: "4.x"
+    description: >
+      Refinement of protocols and parameter normalization.
+    compatibility_level: high
+    requires_mapping: false
+
+# ==========================================================
+# INTERPRETATION MAPPINGS
+# ==========================================================
+
+interpretation_mappings:
+
+  episodic_memory:
+
+    rules:
+      - map_emotive_snapshot_to_current_axes
+      - preserve_original_numeric_values
+      - annotate_legacy_context_if_missing
+
+    legacy_fields:
+      deprecated:
+        - emotion_label
+        - free_text_affect
+      mapped_to:
+        eva_matrix_axes:
+          emotion_label:
+            mapping_strategy: approximate
+            note: >
+              Legacy emotion labels are approximated to
+              EVA Matrix axes without reclassification.
+
+  semantic_memory:
+
+    rules:
+      - preserve_epistemic_status
+      - do_not_upgrade_confidence
+      - attach_version_context
+
+    legacy_confidence:
+      handling: clamp
+      max_allowed: legacy_max
+      note: >
+        Confidence values from earlier versions
+        must not be inflated under newer GKS.
+
+  policy_decisions:
+
+    rules:
+      - replay_under_current_principles
+      - prohibit_reexecution
+      - annotate_historical_context
+
+    deprecated_protocols:
+      handling: map_to_nearest_active_protocol
+      fallback: framework_only
+
+# ==========================================================
+# MASTER BLOCK COMPATIBILITY
+# ==========================================================
+
+master_block:
+
+  stability_guarantee:
+    backward_compatible: true
+    forward_compatible: false
+
+  deprecated_master_handling:
+    - mark_as_legacy
+    - prevent_new_activation
+    - allow_historical_reference
+
+# ==========================================================
+# CONFLICT RESOLUTION
+# ==========================================================
+
+conflict_resolution:
+
+  priority_order:
+    - safety_block
+    - current_master_block
+    - compatibility_map
+    - legacy_context
+
+  unresolved_conflict:
+    action:
+      - halt_interpretation
+      - request_user_guidance
+
+# ==========================================================
+# METADATA & ANNOTATION
+# ==========================================================
+
+annotation:
+
+  attach_to_interpreted_objects:
+    - gks_version_at_creation
+    - compatibility_mapping_applied
+    - interpretation_notes
+
+# ==========================================================
+# VALIDATION & AUDIT
+# ==========================================================
+
+validation:
+
+  required_checks:
+    - version_pair_supported
+    - mapping_rules_applied
+    - no_forward_assumptions
+
+audit:
+
+  log_all_interpretations: true
+
+  audit_fields:
+    - source_version
+    - target_version
+    - applied_mappings
+    - timestamp
+    - interpreter (MSP)
+
+  audit_tags:
+    - gks_compatibility
+    - identity_continuity
+    - backward_interpretation

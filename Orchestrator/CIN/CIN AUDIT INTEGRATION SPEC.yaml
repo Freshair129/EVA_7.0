@@ -1,0 +1,211 @@
+schema: CIN-Audit-Integration-v5.5-AI
+version: 5.5-AI
+updated: 2025-12-10
+
+module:
+  id: CIN_Auditor
+  name: CIN Self-Audit & Injection Validator
+  owner: EVA
+  description: >
+    โมดูลตรวจสอบคุณภาพของ CIN Context Injection ก่อนส่งให้ LLM
+    ใช้ข้อมูลจาก Injection Validation Log เพื่อสร้าง audit layer ใหม่
+    ที่ป้องกันการหลุด context, emotional mismatch,
+    directive corruption และ memory-leak risk.
+
+# ============================================================
+# AUDIT INPUTS
+# ============================================================
+
+inputs:
+
+  - name: llm_context_block
+    description: "บริบทที่ CIN เตรียมจะส่งเข้า LLM"
+    fields:
+      - system_header
+      - persona_brief
+      - emotional_brief
+      - session_brief
+      - active_topics
+      - completed_topics
+      - top_semantic_use
+      - high_salience_episode_refs
+      - llm_directives
+      - safety_constraints
+
+  - name: injection_metadata
+    description: "ข้อมูลการสร้าง context ครั้งล่าสุดของ CIN"
+    fields:
+      - turn_id
+      - timestamp
+      - context_size_bytes
+      - priority_dropped_fields
+
+  - name: emotional_state_9d
+    description: "สถานะอารมณ์ล่าสุดเพื่อเช็ค consistency"
+
+  - name: persona_state
+    description: "ใช้ตรวจสอบ directive consistency"
+
+  - name: boot_metadata
+    description: "ข้อมูลภายใน runtime daemon เพื่อเช็ค system drift"
+    fields:
+      - uptime
+      - ticks
+      - last_error
+
+# ============================================================
+# AUDIT CHECKLIST RULES
+# ============================================================
+
+audit_rules:
+
+  persona_consistency_check:
+    description: >
+      CIN ต้อง inject persona_brief ตรงกับสถานะ persona ล่าสุดของระบบ
+    check:
+      - "persona_brief[*] == persona_state[*]"
+    fail_action: "block_injection_and_log"
+
+  emotional_stability_check:
+    description: >
+      emotional_brief ต้องตรงกับ emotional_state_9d ล่าสุด
+    check:
+      - "emotional_brief[*] == emotional_state_9d[*]"
+    tolerance: 0.05
+    fail_action: "auto_correct_and_warn"
+
+  directive_integrity_check:
+    description: >
+      llm_directives ต้องไม่หาย, ไม่ corrupt, ไม่โดนตัดคำสำคัญ
+    must_contain:
+      - "SYSTEM:"
+      - "Memory is immutable"
+      - "Use persona_brief"
+      - "Do not modify memory"
+    fail_action: "regenerate_directives"
+
+  topic_alignment_check:
+    description: >
+      active_topics ต้องสอดคล้องกับ cache summary
+      และห้ามมี topic ที่ถูก mark completed แล้ว
+    checks:
+      - "active_topics ∩ completed_topics = ∅"
+    fail_action: "remove_invalid_topics"
+
+  semantic_use_integrity_check:
+    description: >
+      top_semantic_use ต้องอยู่ใน range ที่ MSP คำนวณ
+      ห้าม CIN สร้าง semantic ใหม่เอง
+    check:
+      - "len(top_semantic_use) <= 5"
+      - "ทุก use-item ต้องมี score และ key"
+    fail_action: "truncate_and_repair"
+
+  memory_leak_prevention_check:
+    description: >
+      CIN ห้ามส่งข้อมูลดิบจาก episodic memory, raw entry,
+      หรือ memory store อื่นที่ไม่ผ่าน MSP summary
+    forbidden_patterns:
+      - "full_episodic"
+      - "raw_memory"
+      - "semantic_memory_entry"
+      - "statehash_long_form"
+    fail_action: "block_and_flag_security"
+
+  injection_size_limit_check:
+    description: "ตรวจว่า context block ไม่เกิน 4KB"
+    limit_bytes: 4096
+    fail_action: "truncate_low_priority"
+
+  stability_runtime_check:
+    description: >
+      ถ้า daemon uptime < 1s (system เพิ่ง boot) ให้ลด context complexity
+      เพื่อกัน error แบบใน Injection Validation Log
+    rule:
+      - "if uptime < 1.0 → reduce_context_mode = true"
+
+# ============================================================
+# AUDIT OUTPUTS
+# ============================================================
+
+outputs:
+
+  - name: audit_report
+    fields:
+      - turn_id
+      - timestamp
+      - audit_status: ["pass", "warn", "fail"]
+      - repaired_fields
+      - removed_fields
+      - inconsistent_fields
+      - applied_fixes
+      - final_context_size
+      - warnings
+      - fatal_errors
+
+  - name: validated_context_block
+    description: >
+      context ที่ผ่านการตรวจสอบและพร้อมส่งเข้า LLM
+    fields:
+      - system_header
+      - persona_brief
+      - emotional_brief
+      - session_brief
+      - active_topics
+      - completed_topics
+      - top_semantic_use
+      - high_salience_episode_refs
+      - llm_directives
+      - safety_constraints
+
+# ============================================================
+# AUDIT LOGGING RULES
+# ============================================================
+
+logging:
+
+  store_to: "/eva_cin_core/logs/cin_audit/"
+  file_format: "CIN_AUDIT_{turn_id}.json"
+
+  log_fields:
+    - turn_id
+    - timestamp
+    - audit_status
+    - warnings
+    - fatal_errors
+    - before_context_size
+    - after_context_size
+    - fixes_applied
+
+# ============================================================
+# FAILOVER BEHAVIOR
+# ============================================================
+
+failover:
+
+  - condition: "directive_integrity_check FAIL"
+    action:
+      - "restore_from_template"
+      - "mark_warning"
+      - "continue"
+
+  - condition: "persona_consistency_check FAIL"
+    action:
+      - "halt_llm_injection"
+      - "request_runtime_recovery"
+
+  - condition: "memory_leak_prevention_check FAIL"
+    action:
+      - "STOP_IMMEDIATELY"
+      - "log_security_violation"
+      - "notify_runtime_daemon"
+
+# ============================================================
+# META
+# ============================================================
+
+notes:
+  - "Spec นี้ออกแบบจากข้อมูลใน Injection_Validation_Log.md"
+  - "จุดมุ่งหมายคือป้องกัน context corruption แบบที่เกิดใน log"
+  - "CIN ทำหน้าที่เป็น firewall ระหว่าง LLM กับ memory system"
+  - "ทุก audit step deterministic ไม่ใช้ LLM ตัดสินใจ"

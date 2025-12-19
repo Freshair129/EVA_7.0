@@ -1,0 +1,156 @@
+schema: EVA-Semantic-LLM-Proposal-Contract-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Defines the exact structure and epistemic limits of semantic
+  proposals that an LLM may submit to MSP.
+  Proposals are non-authoritative and must be validated
+  and written by MSP only.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - LLM proposals are hypotheses, not facts.
+  - LLM must never assign epistemic authority or confidence.
+  - MSP is the sole authority to write semantic memory.
+  - Proposals may be accepted, modified, merged, or rejected.
+
+# ==========================================================
+# PROPOSAL PAYLOAD (LLM MAY SUBMIT)
+# ==========================================================
+
+proposal_payload:
+
+  required_fields:
+    - concept
+    - definition
+
+  optional_fields:
+    - semantic_frames
+    - conflicts_with
+    - rationale
+    - supporting_evidence
+
+  fields:
+
+    concept:
+      type: string
+      description: >
+        Canonical identifier of the proposed semantic concept.
+        Must be concise, descriptive, and stable.
+
+    definition:
+      type: string
+      description: >
+        Human-readable explanation of the concept.
+        Interpretive only; not a factual assertion.
+
+    semantic_frames:
+      type: array
+      items: string
+      description: >
+        Conceptual frames to contextualize the proposal
+        (e.g., reasoning domain, thematic scope).
+
+    conflicts_with:
+      type: array
+      items: string
+      description: >
+        References to user_block or existing semantic concepts
+        that may conflict with this proposal.
+        Proposal only; MSP verifies.
+
+    rationale:
+      type: string
+      description: >
+        Natural-language reasoning explaining why the concept
+        is proposed. Used for MSP evaluation only.
+
+    supporting_evidence:
+      type: object
+      description: >
+        Optional references to the interaction that motivated
+        this proposal.
+      properties:
+        episode_id:
+          type: string
+        turn_ids:
+          type: array
+          items: string
+      additionalProperties: false
+
+# ==========================================================
+# FORBIDDEN FIELDS (LLM MUST NOT SUBMIT)
+# ==========================================================
+
+forbidden_fields:
+  - semantic_id
+  - epistemic_status
+  - confidence
+  - resolution_state
+  - related_blocks
+  - created_at
+  - last_updated
+  - promotion_level
+  - user_block
+  - write_mode
+
+# ==========================================================
+# VALIDATION RULES (MSP SIDE)
+# ==========================================================
+
+validation:
+
+  concept_rules:
+    - must_be_lowercase_snake_case
+    - must_not_encode_certainty
+    - must_not_reference_identity_fields
+
+  definition_rules:
+    - must_be_interpretive
+    - must_not_claim_truth
+    - must_not_override_user_grounding
+
+  conflict_rules:
+    - conflicts_with_are_advisory_only
+    - MSP_must_verify_before_use
+
+# ==========================================================
+# MSP HANDLING OPTIONS
+# ==========================================================
+
+msp_handling:
+
+  on_accept:
+    actions:
+      - generate_semantic_id
+      - assign_epistemic_status
+      - assign_confidence
+      - write_semantic_memory
+
+  on_modify:
+    actions:
+      - normalize_concept
+      - adjust_definition
+      - merge_with_existing_semantic
+
+  on_reject:
+    actions:
+      - discard_proposal
+      - log_reason
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  tag_all_proposals_with:
+    - llm_proposed
+    - non_authoritative
+
+  retain_rejected_proposals: false

@@ -1,0 +1,223 @@
+schema: EVA-MSP-Write-Policy-v1.1
+version: 1.1
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Authoritative policy governing how MSP validates, writes,
+  suppresses, and promotes memory across EVA memory layers.
+  MSP is the sole writer of persistent memory.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - MSP is the single authority for all memory writes.
+  - LLM output is always non-authoritative by default.
+  - Numeric state may be stored for recall and matching,
+    but never interpreted as truth.
+  - Memory is written conservatively; promotion requires confirmation.
+  - Separation of experience, hypothesis, and truth is mandatory.
+
+# ==========================================================
+# MEMORY TIERS
+# ==========================================================
+
+memory_tiers:
+
+  episodic:
+    description: >
+      Event-based memory containing indexed experiential state.
+      Supports fast recall, emotional re-experiencing,
+      and similarity matching (RIM / RI).
+
+  semantic:
+    description: >
+      Hypothesized or inferred concepts derived during a session.
+      May conflict with user grounding.
+
+  user_block:
+    description: >
+      Confirmed, stable user truths.
+      Written only after explicit or implicit user confirmation.
+
+# ==========================================================
+# EPISODIC WRITE POLICY
+# ==========================================================
+
+episodic_write:
+
+  authority: MSP
+  default_action: write
+
+  required_fields:
+    - episode_header.episode_id
+    - situation_context.context_id
+    - turns
+    - emotive_snapshot.indexed_state
+    - emotive_snapshot.crosslinks
+
+  allowed_content:
+
+    episode_header:
+      rules:
+        - must_be_generated_by_msp
+        - immutable_after_write
+
+    situation_context:
+      source: llm_proposed
+      rules:
+        - enum_validated
+        - non_authoritative
+
+    turns:
+      rules:
+        - turn_id_generated_by_msp
+        - raw_text_preserved
+        - llm_may_write_interpretive_fields_only
+
+    emotive_snapshot:
+      rules:
+        - indexed_state_only
+        - no_labels
+        - no_semantic_interpretation
+
+      indexed_state:
+        eva_matrix:
+          allowed_axes:
+            - stress_load
+            - social_warmth
+            - drive_level
+            - cognitive_clarity
+          rules:
+            - numeric_only
+            - range_0_to_1
+
+        qualia:
+          allowed_fields:
+            - intensity
+          rules:
+            - numeric_only
+            - range_0_to_1
+
+        reflex:
+          allowed_fields:
+            - threat_level
+          rules:
+            - numeric_only
+            - range_0_to_1
+
+      crosslinks:
+        allowed_refs:
+          - ess_refs
+          - eva_matrix_refs
+          - rms_refs
+          - semantic_refs
+          - sensory_refs
+          - gks_refs
+        rules:
+          - id_reference_only
+          - no_embedded_state
+
+  forbidden_content:
+    - emotion_label
+    - joy_level
+    - primary_axis
+    - secondary_axis
+    - hormone_levels
+    - PK_state
+    - dose_input
+    - RI
+    - RIM
+    - memory_color_ref
+    - promotion_level
+
+# ==========================================================
+# SEMANTIC WRITE POLICY
+# ==========================================================
+
+semantic_write:
+
+  authority: MSP
+  default_action: conditional_write
+
+  allowed_fields:
+    - concept
+    - confidence
+    - status
+    - derived_from_episode
+
+  default_status: hypothesis
+
+  conflict_handling:
+    if_conflicts_with_user_block:
+      action: retain
+      status: hypothesis
+      confidence_penalty: 0.2
+
+# ==========================================================
+# USER BLOCK WRITE POLICY
+# ==========================================================
+
+user_block_write:
+
+  authority: MSP
+  default_action: suppress
+
+  write_conditions:
+    - user_confirmation_detected
+    - conflict_resolved
+    - confidence_above: 0.8
+
+  forbidden_sources:
+    - llm_inference_only
+    - unverified_semantic_memory
+
+# ==========================================================
+# PROMOTION RULES
+# ==========================================================
+
+promotion_rules:
+
+  episodic_to_core:
+    conditions:
+      - repeated_recall_count >= 3
+      - indexed_state_stability_high
+    action: compress_and_promote
+
+  semantic_to_user_block:
+    conditions:
+      - status == confirmed
+      - user_affirmed == true
+    action: promote
+
+# ==========================================================
+# SUPPRESSION RULES
+# ==========================================================
+
+suppression_rules:
+
+  suppress_if:
+    - incomplete_indexed_state
+    - system_noise_detected
+    - corrupted_crosslink
+
+  retention_policy:
+    episodic: retain
+    semantic: decay_if_unused
+    user_block: permanent
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  log_all_write_decisions: true
+  log_rejected_fields: true
+
+  metadata_tags:
+    - msp_written
+    - authoritative
+    - versioned

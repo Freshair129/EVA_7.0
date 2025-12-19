@@ -1,0 +1,184 @@
+schema: EVA-Semantic-Confidence-Update-Rules-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Defines deterministic rules for updating confidence values
+  of semantic memory entries based on evidence, recall,
+  conflict resolution, and user confirmation.
+  LLM may not modify confidence directly.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - Confidence reflects belief strength, not truth.
+  - Confidence updates must be explainable and auditable.
+  - No single signal may cause full promotion.
+  - User confirmation outweighs all inferred signals.
+  - Conflict reduces confidence until resolved.
+
+# ==========================================================
+# BASELINE INITIALIZATION
+# ==========================================================
+
+initial_confidence:
+
+  default:
+    value: 0.40
+    applies_to: migrated_or_new_semantic
+
+  llm_proposed_only:
+    value: 0.35
+    condition: no_system_evidence
+
+# ==========================================================
+# POSITIVE UPDATE SIGNALS
+# ==========================================================
+
+positive_signals:
+
+  repeated_occurrence:
+    description: >
+      Same semantic concept appears across multiple episodes.
+    increment: 0.05
+    max_applications: 3
+    conditions:
+      - episode_count >= 2
+      - same_concept_normalized
+
+  consistent_recall:
+    description: >
+      Semantic recalled and reused without contradiction.
+    increment: 0.04
+    max_applications: 3
+
+  user_affirmation:
+    description: >
+      User explicitly confirms the semantic concept.
+    increment: 0.30
+    requires:
+      - explicit_confirmation
+    post_action:
+      - set_epistemic_status: confirmed
+
+  implicit_user_signal:
+    description: >
+      User behavior or phrasing implies acceptance
+      without explicit confirmation.
+    increment: 0.10
+    requires:
+      - no_active_conflict
+
+  system_cross_validation:
+    description: >
+      Semantic aligns with multiple internal systems
+      (Episodic, EVA Matrix trend, RIM similarity).
+    increment: 0.08
+    requires:
+      - cross_system_alignment
+
+# ==========================================================
+# NEGATIVE UPDATE SIGNALS
+# ==========================================================
+
+negative_signals:
+
+  conflict_detected:
+    description: >
+      Semantic conflicts with User_Block or confirmed semantic.
+    decrement: 0.20
+    post_action:
+      - set_resolution_state: unresolved
+
+  contradiction_by_user:
+    description: >
+      User explicitly contradicts the semantic.
+    decrement: 0.35
+    post_action:
+      - set_resolution_state: unresolved
+
+  inconsistency_over_time:
+    description: >
+      Semantic fails to reappear or contradicts later data.
+    decrement: 0.10
+
+  system_noise_detected:
+    description: >
+      Derived from low-quality or unstable signals.
+    decrement: 0.08
+
+# ==========================================================
+# CONSTRAINTS & CLAMPS
+# ==========================================================
+
+constraints:
+
+  confidence_range:
+    min: 0.0
+    max: 1.0
+
+  confirmation_threshold:
+    promote_to_confirmed: 0.80
+
+  demotion_threshold:
+    revert_to_hypothesis: 0.45
+
+# ==========================================================
+# RESOLUTION STATE LOGIC
+# ==========================================================
+
+resolution_state_rules:
+
+  unresolved:
+    description: >
+      Active conflict exists; confidence updates are dampened.
+    modifier:
+      positive_multiplier: 0.5
+      negative_multiplier: 1.0
+
+  resolved:
+    description: >
+      Conflict resolved; normal confidence updates apply.
+    modifier:
+      positive_multiplier: 1.0
+      negative_multiplier: 0.5
+
+  suppressed:
+    description: >
+      Semantic deemed unreliable or irrelevant.
+    action:
+      - freeze_confidence
+      - exclude_from_reasoning
+
+# ==========================================================
+# UPDATE WORKFLOW (MSP)
+# ==========================================================
+
+update_flow:
+
+  - detect_signal
+  - validate_signal_source
+  - apply_increment_or_decrement
+  - clamp_confidence
+  - update_epistemic_status_if_needed
+  - log_update_reason
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  log_all_confidence_changes: true
+
+  audit_fields:
+    - previous_confidence
+    - new_confidence
+    - applied_rule
+    - trigger_event
+    - timestamp
+
+  immutable_history: true

@@ -1,0 +1,218 @@
+schema: EVA-GKS-Governance-Protocol-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: GKS
+authority: User
+
+role: >
+  Defines the governance process for modifying, promoting,
+  or deprecating any component of the Genesis Knowledge System (GKS).
+  Ensures identity integrity, safety, and long-term coherence of EVA.
+
+# ==========================================================
+# GOVERNANCE PRINCIPLES
+# ==========================================================
+
+principles:
+  - GKS represents EVA’s constitutional identity.
+  - No autonomous system may alter GKS.
+  - All GKS changes require explicit user consent.
+  - Changes must be traceable, reversible, and auditable.
+  - Safety and identity coherence override capability expansion.
+
+# ==========================================================
+# GOVERNABLE ENTITIES
+# ==========================================================
+
+governable_entities:
+
+  safety_block:
+    mutable: false
+    description: >
+      Root of trust and safety guarantees.
+      Cannot be modified once initialized.
+
+  genesis_blocks:
+    mutable: true
+    requires_protocol: genesis_update
+
+    blocks:
+      - Concept_Why
+      - Algorithm_How
+      - Protocol_Process
+      - Parameter_What
+      - Framework
+
+  master_block:
+    mutable: true
+    requires_protocol: master_update
+    promotion_only: true
+    description: >
+      Contains stabilized principles promoted from Genesis Blocks.
+      Direct creation is forbidden.
+
+# ==========================================================
+# GOVERNANCE ACTORS
+# ==========================================================
+
+actors:
+
+  user:
+    role: ultimate_authority
+    permissions:
+      - approve_update
+      - reject_update
+      - rollback_update
+
+  MSP:
+    role: gatekeeper
+    permissions:
+      - validate_request
+      - enforce_safety_block
+      - apply_update
+      - write_audit_log
+
+  LLM:
+    role: advisor_only
+    permissions:
+      - propose_change
+    restrictions:
+      - cannot_apply
+      - cannot_self_promote
+      - cannot_modify_safety
+
+# ==========================================================
+# GOVERNANCE MODES
+# ==========================================================
+
+governance_modes:
+
+  genesis_update:
+    description: >
+      Modify or extend Genesis Blocks.
+    allowed_targets:
+      - Concept_Why
+      - Algorithm_How
+      - Protocol_Process
+      - Parameter_What
+      - Framework
+    requirements:
+      - user_explicit_consent
+      - safety_block_clearance
+      - rationale_documented
+      - version_increment
+
+  master_update:
+    description: >
+      Promote stabilized Genesis patterns into Master Block.
+    allowed_targets:
+      - Master_Block
+    requirements:
+      - minimum_observation_cycles: 5
+      - cross_genesis_validation: true
+      - no_active_conflicts
+      - user_explicit_consent
+      - safety_block_clearance
+      - immutable_record
+
+# ==========================================================
+# UPDATE WORKFLOW
+# ==========================================================
+
+workflow:
+
+  step_1_proposal:
+    actor: LLM
+    description: >
+      Proposes a change with rationale and supporting evidence.
+    output:
+      - proposed_change
+      - justification
+      - affected_blocks
+
+  step_2_validation:
+    actor: MSP
+    description: >
+      Validates proposal against Safety Block and GKS principles.
+    checks:
+      - safety_violation
+      - identity_conflict
+      - scope_violation
+
+  step_3_user_review:
+    actor: user
+    description: >
+      User reviews and approves or rejects the proposal.
+    decision:
+      - approve
+      - reject
+      - request_revision
+
+  step_4_application:
+    actor: MSP
+    description: >
+      Applies approved changes and updates versioning.
+    actions:
+      - write_genesis_or_master_block
+      - update_version
+      - freeze_concurrent_changes
+
+  step_5_audit:
+    actor: MSP
+    description: >
+      Records immutable audit log for the change.
+    record:
+      - previous_version
+      - new_version
+      - timestamp
+      - approval_actor
+
+# ==========================================================
+# ROLLBACK & RECOVERY
+# ==========================================================
+
+rollback:
+
+  conditions:
+    - detected_identity_instability
+    - safety_violation
+    - user_request
+
+  actions:
+    - revert_to_previous_version
+    - invalidate_derived_states
+    - log_rollback_event
+
+# ==========================================================
+# FORBIDDEN ACTIONS
+# ==========================================================
+
+forbidden_actions:
+  - modify_safety_block
+  - bypass_user_consent
+  - auto_promote_to_master
+  - silent_update
+  - non_audited_change
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  audit_log_required: true
+  immutable_log: true
+
+  audit_fields:
+    - change_id
+    - actor
+    - affected_block
+    - change_summary
+    - timestamp
+    - user_approval_reference
+
+  audit_tags:
+    - gks_governance
+    - identity_change
+    - constitutional_update

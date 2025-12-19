@@ -1,0 +1,129 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "EVA-Semantic-Memory-v2",
+    "description": "Epistemic semantic memory schema for EVA. Represents hypotheses, provisional knowledge, and confirmed concepts derived from interaction.",
+    "type": "object",
+    "required": [
+        "semantic_id",
+        "concept",
+        "epistemic_status",
+        "confidence",
+        "derived_from",
+        "created_at"
+    ],
+    "properties": {
+        "semantic_id": {
+            "type": "string",
+            "description": "Unique identifier for semantic memory entry."
+        },
+        "concept": {
+            "type": "string",
+            "description": "Canonical semantic concept identifier."
+        },
+        "definition": {
+            "type": "string",
+            "description": "Human-readable explanation of the concept."
+        },
+        "epistemic_status": {
+            "type": "string",
+            "enum": [
+                "hypothesis",
+                "provisional",
+                "confirmed"
+            ],
+            "description": "Epistemic certainty level of the semantic concept."
+        },
+        "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "Confidence score representing belief strength."
+        },
+        "derived_from": {
+            "type": "object",
+            "required": [
+                "episode_id"
+            ],
+            "properties": {
+                "episode_id": {
+                    "type": "string",
+                    "description": "Source episode identifier."
+                },
+                "turn_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Optional turn identifiers contributing to this concept."
+                }
+            },
+            "additionalProperties": false
+        },
+        "semantic_frames": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Frames used to contextualize the semantic concept."
+        },
+        "conflicts_with": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "References to user_block or other semantic entries this concept conflicts with."
+        },
+        "resolution_state": {
+            "type": "string",
+            "enum": [
+                "unresolved",
+                "resolved",
+                "suppressed"
+            ],
+            "description": "Conflict resolution status if conflicts exist."
+        },
+        "related_blocks": {
+            "type": "object",
+            "properties": {
+                "user_block": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "description": "Reference to confirmed user_block if promoted."
+                }
+            },
+            "additionalProperties": false
+        },
+        "created_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "last_updated": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "audit": {
+            "type": "object",
+            "description": "Optional audit metadata for semantic evolution.",
+            "properties": {
+                "created_by": {
+                    "type": "string",
+                    "enum": [
+                        "MSP"
+                    ]
+                },
+                "source": {
+                    "type": "string",
+                    "enum": [
+                        "llm_inference",
+                        "system_reasoning",
+                        "user_confirmation"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

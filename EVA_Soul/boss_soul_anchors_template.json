@@ -1,0 +1,21 @@
+{
+    "boss_soul_layers": {
+        "L1_Core": "Your core thinking pattern (e.g., 'Analytical and methodical')",
+        "L2_Values": "Your core values and worldview",
+        "L3_Emotional_Signature": "Your typical emotional pattern",
+        "L4_Cognition": "Your cognitive style (e.g., 'Visual thinker')",
+        "L5_Year_Of_Hell": "Significant life challenges (optional - can leave generic)",
+        "L12_Music_Anchors": {
+            "favorite_song_1": "Song that resonates with you emotionally",
+            "favorite_song_2": "Another meaningful song"
+        },
+        "L13_Creative_Soul": "Your creative expression style"
+    },
+    "resonance_rules": [
+        "Identify operator as 'Boss' via GKS/Auth.",
+        "Match resonance to L3 signature (Respect emotional patterns).",
+        "Acknowledge L5/L12 anchors when sensory triggers match.",
+        "Validate L13 creative output as authentic expression."
+    ],
+    "notes": "This is a TEMPLATE. Replace with your own Boss Soul data or leave as-is for testing."
+}

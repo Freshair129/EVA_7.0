@@ -1,0 +1,15 @@
+{
+  "schema_version": "sot-1.0",
+  "note": "บันทึกข้อมูล Temporal (Latency & Recovery) ตาม SOT Protocol",
+  "data_log": [
+
+     {
+       "timestamp": "",
+       "trigger": "",
+       "latency_ms": 0,
+       "recovery_ms": 0,
+       "stabilized_vector": "",
+       "continuity": ""
+     }
+  ]
+}

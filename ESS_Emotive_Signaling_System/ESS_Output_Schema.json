@@ -1,0 +1,123 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "EVA-ESS-Output-v1",
+    "type": "object",
+    "required": [
+        "ess_id",
+        "episode_id",
+        "stimulus_vector",
+        "reflex_vector",
+        "kinetic_telemetry"
+    ],
+    "properties": {
+        "ess_id": {
+            "type": "string"
+        },
+        "episode_id": {
+            "type": "string"
+        },
+        "stimulus_vector": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 1.0
+            }
+        },
+        "reflex_vector": {
+            "type": "object",
+            "required": [
+                "urgency_load",
+                "withdrawal",
+                "social_warmth",
+                "cognitive_drive",
+                "threat_level"
+            ],
+            "properties": {
+                "urgency_load": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "withdrawal": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "social_warmth": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "cognitive_drive": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "threat_level": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                }
+            },
+            "additionalProperties": false
+        },
+        "kinetic_telemetry": {
+            "type": "object",
+            "required": [
+                "dose_input",
+                "D_Remaining",
+                "D_Cumulative",
+                "time_tracking"
+            ],
+            "properties": {
+                "dose_input": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                },
+                "D_Remaining": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                },
+                "D_Cumulative": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number"
+                    }
+                },
+                "time_tracking": {
+                    "type": "object",
+                    "required": [
+                        "tick",
+                        "delta_t_sec",
+                        "exposure_duration_sec"
+                    ],
+                    "properties": {
+                        "tick": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "delta_t_sec": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "exposure_duration_sec": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

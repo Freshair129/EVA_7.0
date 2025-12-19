@@ -1,0 +1,269 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "EVA-MSP-Ingest-v1",
+    "description": "Unified ingest payload for MSP (Memory & Soul Passport). MSP is the sole authority for memory admission and persistence.",
+    "type": "object",
+    "required": [
+        "schema",
+        "timestamp",
+        "identity",
+        "sources"
+    ],
+    "properties": {
+        "schema": {
+            "type": "string",
+            "enum": [
+                "EVA-MSP-Ingest-v1"
+            ]
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "identity": {
+            "type": "object",
+            "required": [
+                "episode_id"
+            ],
+            "properties": {
+                "session_id": {
+                    "type": "string"
+                },
+                "episode_id": {
+                    "type": "string"
+                },
+                "ess_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        },
+        "sources": {
+            "type": "object",
+            "description": "Subsystem payloads contributing to memory admission.",
+            "properties": {
+                "ess": {
+                    "$ref": "#/definitions/ess_payload"
+                },
+                "eva_matrix": {
+                    "$ref": "#/definitions/eva_matrix_payload"
+                },
+                "artifact_qualia": {
+                    "$ref": "#/definitions/artifact_qualia_payload"
+                },
+                "rms": {
+                    "$ref": "#/definitions/rms_payload"
+                },
+                "narrative": {
+                    "$ref": "#/definitions/narrative_payload"
+                }
+            },
+            "additionalProperties": false
+        },
+        "admission_hints": {
+            "type": "object",
+            "description": "Non-binding hints for MSP admission logic.",
+            "properties": {
+                "priority": {
+                    "type": "string",
+                    "enum": [
+                        "low",
+                        "standard",
+                        "high"
+                    ]
+                },
+                "memory_class": {
+                    "type": "string",
+                    "enum": [
+                        "trace",
+                        "episodic",
+                        "core",
+                        "sphere"
+                    ]
+                },
+                "write_mode": {
+                    "type": "string",
+                    "enum": [
+                        "append",
+                        "merge",
+                        "suppress"
+                    ]
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false,
+    "definitions": {
+        "ess_payload": {
+            "type": "object",
+            "required": [
+                "stimulus_vector",
+                "reflex_vector",
+                "kinetic_telemetry"
+            ],
+            "properties": {
+                "stimulus_vector": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "minimum": 0.0,
+                        "maximum": 1.0
+                    }
+                },
+                "reflex_vector": {
+                    "type": "object",
+                    "required": [
+                        "threat_level"
+                    ],
+                    "properties": {
+                        "urgency_load": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "withdrawal": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "social_warmth": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "cognitive_drive": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        },
+                        "threat_level": {
+                            "type": "number",
+                            "minimum": 0.0,
+                            "maximum": 1.0
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "kinetic_telemetry": {
+                    "type": "object",
+                    "required": [
+                        "dose_input",
+                        "D_Remaining",
+                        "D_Cumulative",
+                        "time_tracking"
+                    ],
+                    "properties": {
+                        "dose_input": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        },
+                        "D_Remaining": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        },
+                        "D_Cumulative": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        },
+                        "time_tracking": {
+                            "type": "object",
+                            "required": [
+                                "tick",
+                                "delta_t_sec"
+                            ],
+                            "properties": {
+                                "tick": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "delta_t_sec": {
+                                    "type": "number",
+                                    "exclusiveMinimum": 0
+                                },
+                                "exposure_duration_sec": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "number",
+                                        "minimum": 0
+                                    }
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "eva_matrix_payload": {
+            "type": "object",
+            "description": "Optional psychological state snapshot.",
+            "properties": {
+                "axes": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "minimum": 0.0,
+                        "maximum": 1.0
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "artifact_qualia_payload": {
+            "type": "object",
+            "description": "Optional phenomenological snapshot.",
+            "properties": {
+                "snapshot": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": [
+                            "number",
+                            "string"
+                        ]
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "rms_payload": {
+            "type": "object",
+            "description": "Optional RMS encoding output.",
+            "properties": {
+                "memory_color": {
+                    "type": "object"
+                },
+                "intensity": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "trauma_flag": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false
+        },
+        "narrative_payload": {
+            "type": "object",
+            "description": "Optional narrative / semantic content.",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

@@ -1,0 +1,180 @@
+schema: EVA-LLM-Output-Contract-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Defines the exact scope, structure, and epistemic limits
+  of what an LLM is allowed to produce for MSP ingestion.
+  LLM outputs are interpretive, hypothetical, and non-authoritative
+  by default.
+
+# ------------------------------------------------------------------
+# CORE PRINCIPLES
+# ------------------------------------------------------------------
+
+principles:
+  - LLM is not a source of truth.
+  - LLM may infer, summarize, and hypothesize only.
+  - LLM must not emit system metrics, IDs, or memory authority fields.
+  - All LLM outputs are treated as soft signals unless confirmed.
+
+# ------------------------------------------------------------------
+# ALLOWED OUTPUT SECTIONS (LLM MAY WRITE)
+# ------------------------------------------------------------------
+
+allowed_sections:
+
+  episode_content:
+    description: >
+      Narrative and interpretive content of an episode.
+      All fields are non-authoritative.
+    fields:
+
+      raw_text:
+        type: string
+        source: user_input
+        authority: external
+        notes: LLM may pass through verbatim text only.
+
+      text_excerpt:
+        type: string
+        source: llm_generation
+        authority: none
+
+      summary:
+        type: string
+        authority: none
+        epistemic_status: interpretive
+
+      semantic_frames:
+        type: list
+        item_type: string
+        authority: none
+        epistemic_status: framing_only
+
+      affective_inference:
+        description: >
+          Hypothesized affective interpretation inferred from text.
+        fields:
+          epistemic_status:
+            enum: [hypothesize, speculate]
+          emotion_signal:
+            type: string
+            authority: none
+          intensity:
+            type: float
+            range: [0.0, 1.0]
+            authority: none
+          confidence:
+            type: float
+            range: [0.0, 1.0]
+            authority: none
+
+      epistemic_mode:
+        enum: [reflect, inquire, explain, explore]
+        authority: none
+
+  situational_interpretation:
+    description: >
+      Contextual interpretation of the interaction.
+    fields:
+      interaction_mode:
+        enum: [casual, discussion, deep_discussion, crisis]
+        authority: none
+      stakes_level:
+        enum: [low, medium, high]
+        authority: none
+      time_pressure:
+        enum: [low, medium, high]
+        authority: none
+
+# ------------------------------------------------------------------
+# PROPOSE-ONLY FIELDS (LLM MAY SUGGEST, MSP DECIDES)
+# ------------------------------------------------------------------
+
+propose_only:
+
+  episode_tag:
+    type: list
+    item_type: string
+    authority: MSP
+    notes: LLM may suggest tags; MSP validates and normalizes.
+
+  salience_phrase:
+    type: string
+    authority: MSP
+    notes: >
+      Phrase candidate only. Resonance score is MSP-owned.
+
+# ------------------------------------------------------------------
+# FORBIDDEN OUTPUT (LLM MUST NEVER WRITE)
+# ------------------------------------------------------------------
+
+forbidden_fields:
+
+  identity_and_structure:
+    - episode_id
+    - turn_id
+    - context_id
+    - session_id
+    - user_id
+    - instance_id
+
+  metrics_and_scores:
+    - RI
+    - RIM
+    - Resonance_impact
+    - salience_score
+    - confidence_score_system
+    - threat_level
+    - memory_intensity
+
+  physiological_state:
+    - hormone_level
+    - dose_input
+    - D_Remaining
+    - D_Cumulative
+    - PK_state
+
+  phenomenological_state:
+    - eva_matrix
+    - emotive_snapshot
+    - indexed_state
+    - qualia_snapshot
+
+  memory_control:
+    - memory_color_ref
+    - trauma_flag
+    - promotion_level
+    - write_mode
+    - admission_priority
+
+# ------------------------------------------------------------------
+# ENFORCEMENT RULES
+# ------------------------------------------------------------------
+
+enforcement:
+
+  default_epistemic_status: hypothesis
+
+  on_violation:
+    action: reject_field
+    log: true
+    severity: high
+
+  audit_tags:
+    - llm_generated
+    - non_authoritative
+    - requires_validation
+
+# ------------------------------------------------------------------
+# MSP POST-PROCESSING EXPECTATIONS
+# ------------------------------------------------------------------
+
+msp_post_processing:
+
+  - Validate enums and ranges.
+  - Strip forbidden fields.
+  - Annotate LLM outputs with epistemic markers.
+  - Decide admission, promotion, or suppression.

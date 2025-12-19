@@ -1,0 +1,120 @@
+schema: EVA-Sensory-LLM-Proposal-Contract-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Defines what an LLM may propose for sensory-related data.
+  LLM proposals are descriptive only and must not contain
+  interpretation, evaluation, or decision signals.
+  MSP is the sole authority to write sensory memory.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - Sensory data represents evidence, not meaning.
+  - LLM may describe what was captured, not what it means.
+  - No interpretation, emotion, intent, or policy may be proposed.
+  - MSP validates and writes all sensory memory.
+
+# ==========================================================
+# ALLOWED LLM PROPOSAL CONTENT
+# ==========================================================
+
+allowed_fields:
+
+  raw_description:
+    type: string
+    description: >
+      Neutral description of what was captured
+      (e.g. what is visible, audible, or present).
+      Must avoid interpretation or inference.
+
+  feature_hint:
+    type: object
+    description: >
+      Optional hint suggesting measurable features
+      without assigning meaning.
+    allowed_keys:
+      - pitch
+      - volume
+      - tempo
+      - pause_length
+      - tone_descriptor
+
+  source_context:
+    type: object
+    description: >
+      Non-interpretive context of capture.
+    allowed_keys:
+      - source_name
+      - capture_channel
+
+# ==========================================================
+# FORBIDDEN LLM CONTENT
+# ==========================================================
+
+forbidden_fields:
+
+  interpretation:
+    - primary_emotion
+    - emotional_label
+    - intent
+    - meaning
+    - description_with_judgement
+
+  metrics_and_state:
+    - eva_matrix
+    - qualia
+    - reflex
+    - RI
+    - RIM
+
+  policy_and_control:
+    - GKS_trigger
+    - recall_priority
+    - awareness_hook
+    - promotion_hint
+
+  identity_and_persistence:
+    - sensory_id
+    - episode_ref
+    - timestamp
+    - checksum
+
+# ==========================================================
+# MSP HANDLING
+# ==========================================================
+
+msp_handling:
+
+  on_accept:
+    actions:
+      - generate_sensory_id
+      - normalize_feature_snapshot
+      - attach_episode_ref
+      - write_sensory_memory
+
+  on_modify:
+    actions:
+      - strip_interpretive_language
+      - discard_invalid_fields
+
+  on_reject:
+    actions:
+      - discard_proposal
+      - log_rejection_reason
+
+# ==========================================================
+# AUDIT
+# ==========================================================
+
+audit:
+  tag_all_proposals_with:
+    - llm_proposed
+    - sensory_candidate
+    - non_authoritative
+
+  retain_rejected_proposals: false

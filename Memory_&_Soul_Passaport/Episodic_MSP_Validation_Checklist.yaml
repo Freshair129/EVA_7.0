@@ -1,0 +1,182 @@
+schema: EVA-Episodic-MSP-Validation-Checklist-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: MSP
+role: >
+  Validation checklist used by MSP to verify episodic proposals
+  before writing to persistent episodic memory.
+  Ensures structural integrity, epistemic safety, and
+  architectural compliance.
+
+# ==========================================================
+# VALIDATION PHASES
+# ==========================================================
+
+validation_phases:
+  - structural_validation
+  - epistemic_validation
+  - state_validation
+  - crosslink_validation
+  - final_admission
+
+# ==========================================================
+# 1. STRUCTURAL VALIDATION
+# ==========================================================
+
+structural_validation:
+
+  required_sections_present:
+    - episode_header
+    - situation_context
+    - turns
+    - emotive_snapshot
+
+  episode_header_checks:
+    - episode_id_generated_by_msp
+    - episode_type_valid
+    - episode_tags_normalized
+
+  situation_context_checks:
+    - context_id_generated_by_msp
+    - interaction_mode_enum_valid
+    - stakes_level_enum_valid
+    - time_pressure_enum_valid
+
+  turn_checks:
+    - all_turns_have_turn_id
+    - turn_ids_unique_and_ordered
+    - speaker_field_valid
+    - raw_text_preserved_for_user_turns
+
+# ==========================================================
+# 2. EPISTEMIC VALIDATION
+# ==========================================================
+
+epistemic_validation:
+
+  llm_boundary_checks:
+    - no_llm_written_ids
+    - no_llm_written_metrics
+    - no_llm_written_state
+
+  affective_inference_checks:
+    - epistemic_status_present
+    - epistemic_status_not_confirmed
+    - inference_marked_non_authoritative
+
+  semantic_frame_checks:
+    - frames_are_interpretive_only
+    - no_truth_claims_detected
+
+# ==========================================================
+# 3. STATE VALIDATION (INDEXED STATE ONLY)
+# ==========================================================
+
+state_validation:
+
+  indexed_state_presence:
+    - eva_matrix_present
+    - qualia_present
+    - reflex_present
+
+  eva_matrix_checks:
+    allowed_axes:
+      - stress_load
+      - social_warmth
+      - drive_level
+      - cognitive_clarity
+    rules:
+      - numeric_only
+      - range_0_to_1
+      - no_extra_axes
+
+  qualia_checks:
+    allowed_fields:
+      - intensity
+    rules:
+      - numeric_only
+      - range_0_to_1
+
+  reflex_checks:
+    allowed_fields:
+      - threat_level
+    rules:
+      - numeric_only
+      - range_0_to_1
+
+# ==========================================================
+# 4. CROSSLINK VALIDATION
+# ==========================================================
+
+crosslink_validation:
+
+  crosslinks_present: true
+
+  allowed_crosslink_types:
+    - ess_refs
+    - eva_matrix_refs
+    - rms_refs
+    - semantic_refs
+    - sensory_refs
+    - gks_refs
+
+  rules:
+    - id_reference_only
+    - no_embedded_state
+    - referenced_ids_exist_or_deferred
+
+# ==========================================================
+# 5. FORBIDDEN CONTENT CHECK
+# ==========================================================
+
+forbidden_content_check:
+
+  forbidden_fields_must_not_exist:
+    - emotion_label
+    - memory_color_ref
+    - RI
+    - RIM
+    - hormone_level
+    - dose_input
+    - D_Remaining
+    - D_Cumulative
+    - PK_state
+    - promotion_level
+    - write_mode
+
+# ==========================================================
+# 6. FINAL ADMISSION DECISION
+# ==========================================================
+
+final_admission:
+
+  admission_conditions:
+    - all_validation_phases_passed
+    - indexed_state_complete
+    - no_critical_policy_violation
+
+  on_accept:
+    actions:
+      - write_episodic_memory
+      - log_admission_success
+
+  on_reject:
+    actions:
+      - reject_episode
+      - log_rejection_reason
+      - preserve_llm_proposal: false
+
+# ==========================================================
+# AUDIT & LOGGING
+# ==========================================================
+
+audit:
+
+  log_validation_results: true
+  log_failed_checks: true
+
+  audit_tags:
+    - episodic_validated
+    - msp_authorized
+    - production_ready

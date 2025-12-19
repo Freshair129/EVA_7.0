@@ -1,0 +1,102 @@
+schema: EVA-RMS-Interface-v1
+version: 1.0
+updated: 2025-12-18
+
+name: Resonant Memory System Interface
+role: experiential_memory_encoding
+
+description: >
+  RMS encodes phenomenological experience into memory-relevant signals.
+  It does not interpret meaning or language, only experiential patterns.
+
+# -------------------------------------------------------------------
+# POSITION
+# -------------------------------------------------------------------
+
+position:
+  upstream:
+    - EVA_Matrix
+    - Artifact_Qualia
+  downstream:
+    - TraumaStore
+    - Episodic_Memory
+
+execution_order:
+  - Artifact_Qualia_Update
+  - RMS_Encoding
+  - Trauma_Storage
+  - Episodic_Memory_Link
+
+# -------------------------------------------------------------------
+# INPUT CONTRACT
+# -------------------------------------------------------------------
+
+inputs:
+  eva_matrix_state:
+    source: EVA_Matrix
+    type: psychological_state_space
+    required: true
+
+  qualia_snapshot:
+    source: Artifact_Qualia
+    type: phenomenological_snapshot
+    required: true
+
+  reflex_state:
+    source: ESS
+    type: safety_reflex
+    required: true
+
+    required_fields:
+      threat_level:
+        range: [0.0, 1.0]
+
+# -------------------------------------------------------------------
+# OUTPUT CONTRACT
+# -------------------------------------------------------------------
+
+outputs:
+  memory_encoding:
+    description: >
+      Non-semantic encoding of experiential memory.
+
+    fields:
+      memory_color:
+        type: rgb_hsl_hex
+        description: >
+          Psychologically grounded color encoding derived from EVA Matrix only.
+
+      intensity:
+        type: float
+        range: [0.0, 1.0]
+        description: >
+          Experiential load, not importance or emotion.
+
+      trauma_flag:
+        type: boolean
+        description: >
+          Safety indicator based on reflex state only.
+
+# -------------------------------------------------------------------
+# CONSTRAINTS
+# -------------------------------------------------------------------
+
+constraints:
+  forbidden_actions:
+    - language_processing
+    - meaning_inference
+    - decision_making
+
+  forbidden_inputs:
+    - raw_text
+    - hormone_levels
+    - intent_labels
+
+# -------------------------------------------------------------------
+# INVARIANTS
+# -------------------------------------------------------------------
+
+invariants:
+  - RMS must generate color internally.
+  - TraumaStore must not generate color.
+  - Same state → same encoding.

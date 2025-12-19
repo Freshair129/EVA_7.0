@@ -1,0 +1,54 @@
+schema: CIN-Formatting-Layer-v5.5
+version: 5.5
+description: >
+  Formatting Layer ทำหน้าที่จัดโครงสร้างข้อความให้อยู่ในรูปแบบที่ LLM เข้าใจง่าย
+  โดยไม่ให้ข้อมูลหลุดขอบเขต, ไม่ผสาน memory ดิบ, และคงความ deterministic 100%
+
+inputs:
+  - validated_context_block  # จาก cin_audit_engine
+
+outputs:
+  - formatted_prompt         # พร้อมส่ง LLM
+
+format_rules:
+
+  header:
+    prefix: "[EVA CONTEXT v5.5]\n"
+    suffix: "\n---\n"
+
+  sections:
+    - name: persona
+      title: "## Persona State"
+      include_fields: persona_brief
+
+    - name: emotional
+      title: "## Emotional State (9D)"
+      include_fields: emotional_brief
+
+    - name: session
+      title: "## Session Summary"
+      include_fields: session_brief
+
+    - name: topics
+      title: "## Conversation Topics"
+      include_fields:
+        - active_topics
+        - completed_topics
+
+    - name: semantic
+      title: "## User Semantic Profile (Top 5)"
+      include_fields: top_semantic_use
+
+    - name: high_salience
+      title: "## Important Recent Episodes (Top 3)"
+      include_fields: high_salience_episode_refs
+
+    - name: directives
+      title: "## EVA Directives"
+      include_fields: llm_directives
+
+  formatting_behavior:
+    bullet_indent: "  - "
+    json_indent: 2
+    omit_empty_sections: true
+    max_prompt_bytes: 4096

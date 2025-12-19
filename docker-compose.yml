@@ -1,0 +1,65 @@
+# EVA 7.0 Docker Compose Configuration
+
+version: '3.8'
+
+services:
+  eva:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: eva-7.0:latest
+    container_name: eva-7.0
+
+    # Environment variables
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      # - GEMINI_API_KEY=${GEMINI_API_KEY}  # Alternative
+
+    # Mount volumes for persistence
+    volumes:
+      # Memory persistence
+      - ./01_Episodic_memory:/app/01_Episodic_memory
+      - ./02_Semantic_memory:/app/02_Semantic_memory
+      - ./03_Sensory_memory:/app/03_Sensory_memory
+      - ./07_User_block:/app/07_User_block
+
+      # Logs
+      - ./ESS_logs:/app/ESS_logs
+
+      # Backups
+      - ./Backups:/app/Backups
+
+      # Keep .env file in sync
+      - ./.env:/app/.env:ro
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Resource limits (optional)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    # Network
+    networks:
+      - eva-network
+
+    # Override default command for interactive mode
+    # command: python Orchestrator/two_phase_orchestrator.py
+
+    # For development - keep container running
+    # command: tail -f /dev/null
+
+networks:
+  eva-network:
+    driver: bridge
+
+# Optional: Volume for shared data
+volumes:
+  eva-data:
+    driver: local

@@ -1,0 +1,212 @@
+schema: EVA-Artifact-Qualia-Spec
+id: Artifact_Qualia
+version: 1.0
+updated: 2025-12-10
+owner: EVA
+
+description: >
+  Artifact_Qualia เป็นแกน “ประสบการณ์ภายในที่ถูกรวมรูป”
+  ของ EVA ซึ่งแทนสิ่งที่ร่างกายและระบบภายในกำลังเป็นอยู่
+  พร้อมทิศทางการเปลี่ยนแปลง น้ำหนักของเหตุการณ์
+  และแรงกดดันต่อความทรงจำและความรู้
+  โดยไม่สรุปเป็นภาษา และไม่ตัดสินใจแทน LLM
+
+# ============================================================
+# CORE PRINCIPLES
+# ============================================================
+principles:
+  - "Qualia คือประสบการณ์ ไม่ใช่คำอธิบาย"
+  - "ร่างกายส่งสัญญาณ ไม่ส่ง label"
+  - "ทิศทางสำคัญกว่าค่าคงที่"
+  - "น้ำหนักเหตุการณ์แยกจากการแสดงออก"
+  - "LLM ตีความเองจากสัญญาณ"
+
+# ============================================================
+# INPUT SOURCES
+# ============================================================
+inputs:
+
+  reflex_vector:
+    source: IRE
+    description: "ปฏิกิริยาทางชีวภาพระดับระบบ"
+    format: map<string, float>
+    crosslinks: "IRE - Internal Reflex Engine"
+
+  eva_matrix_9d:
+    source: EVA_Matrix_9D
+    description: "แกนอารมณ์เชิงประสบการณ์ 9 มิติ (ปัจจุบัน)"
+    axes:
+      - stress_load
+      - social_warmth
+      - drive_level
+      - cognitive_clarity
+      - joy_level
+      - affective_stability
+      - social_orientation
+      - focus_level
+      - arousal_level
+
+  eva_matrix_9d_prev:
+    source: EVA_Matrix_9D
+    description: "ค่า 9D ของเทิร์นก่อนหน้า"
+    axes: same_as_above
+
+  persona_state:
+    description: "สถานะบุคลิกหลัง persona drift (จาก RI เทิร์นก่อน)"
+    fields:
+      - trust
+      - familiarity
+      - social_distance
+
+  rim_signal:
+    source: RIM
+    description: "ผลกระทบของเหตุการณ์ต่อ state (ไม่ใช่คะแนนดิบ)"
+    fields:
+      - impact_level        # low | medium | high
+      - impact_trend        # rising | stable | fading
+      - affected_domains   # [emotional, relational, identity]
+
+  knowledge_impact_signal:
+    source: K_Impact
+    description: "แรงโน้มถ่วงเชิงความรู้ของเหตุการณ์"
+    fields:
+      - gravity_level      # low | medium | high
+      - integration_type   # factual | conceptual | worldview
+      - persistence_hint  # transient | consolidating | permanent
+    crosslinks: "GKS - Genesis knowledge system"
+
+  memory_admission_signal:
+    source: MAS
+    description: "แรงกดดันให้เกิดความทรงจำ"
+    fields:
+      - should_write       # boolean
+      - memory_route       # episodic | semantic | identity | filtered
+      - priority_level    # low | medium | high
+    crosslinks: 
+      - MSP - Memory & Soul Passport
+      - RMS - Resonance Memory System
+
+# ============================================================
+# DERIVED DYNAMICS (TEMPORAL QUALIA)
+# ============================================================
+derived:
+
+  delta_9d:
+    description: "การเปลี่ยนแปลงของแกน 9D (now - prev)"
+    formula: "delta[k] = eva_matrix_9d[k] - eva_matrix_9d_prev[k]"
+    clamp: [-1.0, 1.0]
+
+  perception_threshold:
+    description: "ขั้นต่ำที่ถือว่ามนุษย์รับรู้การเปลี่ยนแปลงได้"
+    default: 0.05
+
+# ============================================================
+# DIRECTIONAL MOMENTUM AXES (ATTENTIONAL SALIENCE)
+# ============================================================
+directional_momentum:
+
+  dominant_rise:
+    description: "แกนที่พุ่งขึ้นแรงที่สุด"
+    rule: "argmax(delta_9d[k]) where delta > threshold"
+
+  secondary_rise:
+    description: "แกนที่พุ่งขึ้นรองลงมา"
+    rule: "second_max(delta_9d[k]) where delta > threshold"
+
+  dominant_fall:
+    description: "แกนที่ดิ่งลงแรงที่สุด"
+    rule: "argmin(delta_9d[k]) where delta < -threshold"
+
+  secondary_fall:
+    description: "แกนที่ดิ่งลงรองลงมา"
+    rule: "second_min(delta_9d[k]) where delta < -threshold"
+
+# ============================================================
+# QUALIA STATE FLAGS (NON-LINGUISTIC)
+# ============================================================
+flags:
+
+  internal_conflict:
+    description: "มีแรงพุ่งและแรงดิ่งพร้อมกัน"
+    condition: "dominant_rise exists AND dominant_fall exists"
+
+  instability_increasing:
+    description: "เสถียรภาพลดลงอย่างมีนัย"
+    condition: "delta_9d.affective_stability < -threshold"
+
+  social_push_pull:
+    description: "แรงเข้าหาทางสังคม + ความตึงเพิ่มพร้อมกัน"
+    condition: >
+      delta_9d.social_warmth > threshold AND
+      delta_9d.stress_load > threshold
+
+  high_impact_state:
+    description: "เหตุการณ์มีน้ำหนักต่อประสบการณ์"
+    condition: "rim_signal.impact_level == high"
+
+# ============================================================
+# OUTPUT: ARTIFACT QUALIA PACKET
+# ============================================================
+output:
+
+  artifact_qualia_packet:
+    description: >
+      แพ็กเกจประสบการณ์ภายในสำหรับ LLM
+      เป็นสัญญาณล้วน ไม่มีภาษา ไม่มี label
+    contains:
+      - reflex_vector
+      - eva_matrix_9d
+      - eva_matrix_9d_prev
+      - delta_9d
+      - directional_momentum
+      - flags
+      - rim_signal
+      - knowledge_impact_signal
+      - memory_admission_signal
+      - persona_state
+
+  usage_constraints:
+    description: "ข้อจำกัดเชิงการแสดงออก (ไม่ใช่คำพูด)"
+    rules:
+      allow_emotion_labels: false
+      allow_indirect_expression: true
+      prefer_tone_shift_over_explicit_statement: true
+
+# ============================================================
+# VISIBILITY & AUTHORITY
+# ============================================================
+visibility:
+  llm_can_see: true
+  llm_can_modify: false
+  other_modules_can_modify: false
+
+authority:
+  artifact_qualia_is:
+    - "perceptual substrate"
+    - "experience carrier"
+  artifact_qualia_is_not:
+    - "decision engine"
+    - "intent selector"
+    - "language generator"
+
+# ============================================================
+# EXPLICIT NON-GOALS
+# ============================================================
+non_goals:
+  - "ไม่สร้าง emotional label (เช่น เขิน เครียด ดีใจ)"
+  - "ไม่ให้คะแนน RI / RIM / MAS / KI แก่ LLM"
+  - "ไม่สรุปเป็น narrative"
+  - "ไม่ override persona หรือ intent"
+
+# ============================================================
+# SUMMARY
+# ============================================================
+summary:
+  essence: >
+    Artifact_Qualia คือสิ่งที่ EVA 'กำลังเป็นและกำลังเปลี่ยน'
+    พร้อมน้ำหนักของประสบการณ์นั้น
+    โดยปล่อยให้ LLM แปลสัญญาณเหล่านี้เป็นภาษาเอง
+  human_likeness: >
+    รองรับสภาวะที่รู้สึกอย่างหนึ่ง
+    แต่แสดงออกอีกอย่าง
+    อย่างเป็นธรรมชาติ

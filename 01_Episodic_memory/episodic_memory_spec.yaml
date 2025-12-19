@@ -1,0 +1,227 @@
+spec_id: episodic_memory_spec_vFinal_archive
+system: EVA
+layer: Memory_System
+type: Episodic_Archive
+design_paradigm: human_like_trace_memory
+
+purpose: >
+  Episodic Memory is an immutable archive that records what happened,
+  who said it, and under which contextual and epistemic conditions.
+  It performs no admission, prioritization, or decision-making.
+  All episodes are preserved as trace-level evidence for downstream systems.
+
+core_principles:
+  - episodic_is_archive
+  - record_every_episode
+  - two_turns_per_episode
+  - speaker_and_source_hygiene
+  - inference_is_not_fact
+  - no_decision_no_promotion
+
+episode_policy:
+  recording_rule: >
+    Every interaction is recorded as one episode.
+    Each episode MUST contain exactly two turns.
+  deletion_policy: immutable
+  overwrite_policy: forbidden
+
+episode_structure:
+
+  header:
+    description: Episode identity and temporal boundary
+    fields:
+      episode_id: unique_identifier
+      session_id: session_scope
+      context_id:
+        description: >
+          Identifier for a shared situational thread across episodes.
+        type: string
+      timestamp: iso_8601
+      episode_type:
+        enum:
+          - interaction
+          - synthesis
+          - system_error
+          - meta_exchange
+
+  situation_context:
+    description: >
+      Observational snapshot of the situational condition.
+      This does not imply importance or priority.
+    fields:
+      interaction_mode:
+        enum:
+          - small_talk
+          - casual
+          - deep_discussion
+          - conflict
+          - instruction
+          - meta
+      stakes_level:
+        enum: [low, medium, high]
+      time_pressure:
+        enum: [low, medium, high]
+
+  turn_1:
+    description: External-facing turn (user, boss, or external source)
+    fields:
+      speaker:
+        enum:
+          - user
+          - system
+          - unknown
+      source_type:
+        enum:
+          - Primary_Information #เรื่องของตัวเอง
+          - Secondary_Information #เรื่องของคนอื่น
+      text_excerpt: short_verbatim_excerpt
+
+      action:
+        description: >
+          Concrete actions producing evidence for sensory memory
+          or tool usage.
+        fields:
+          action_type:
+            enum: [upload, attach, tool_use, none]
+          artifacts:
+            - artifact_id: string
+              artifact_type: image | audio | video | document | data | url
+          tools_used:
+            - tool_id: string
+              purpose: string
+
+      affective_inference:
+        description: >
+          EVA's inferred estimation of user emotional state.
+          Hypothesis only, never factual.
+        epistemic_status: hypothesize
+        fields:
+          emotion_signal: inferred_label
+          intensity: 0.0-1.0
+          confidence: 0.0-1.0
+
+      semantic_frames:
+        description: Meaning-level thematic categories
+        type: list_of_labels
+
+      resonance_notes:
+        description: >
+          Heuristic observations about phrases that appear
+          emotionally or cognitively impactful.
+        type: freeform_notes
+
+      salience_anchor_candidate:
+        description: >
+          Phrase-level recall candidate observed in the interaction.
+          Not validated or promoted at this layer.
+        fields:
+          phrase: string
+          source_turn: turn_1
+          confidence: 0.0-1.0
+
+  turn_2:
+    description: EVA response turn
+    fields:
+      speaker:
+        enum:
+          - eva
+          - unknown
+          - llm
+      text_excerpt: short_verbatim_excerpt
+      epistemic_mode:
+        enum:
+          - explore
+          - hypothesize
+          - assert
+          - caution
+          - reflect
+
+      action:
+        description: EVA system actions taken
+        fields:
+          action_type:
+            enum:
+              - response
+              - tool_use
+              - system_adjustment
+              - none
+          tools_used:
+            - tool_id: string
+              purpose: string
+
+  resonance_index:
+    description: >
+      Resonance metrics recorded as observational trace only.
+    fields:
+      RI_global: float
+
+  memory_encoding_level:
+    description: >
+      Observational grading of encoding density.
+      Derived from RMS output, not a decision.
+    source: RMS
+    level:
+      enum:
+        - L0_trace        # small talk / noise
+        - L1_light        # low intensity
+        - L2_standard     # normal meaningful interaction
+        - L3_deep         # filtered_ep
+        - L4_trauma       # trauma route
+  rms_annotation:
+    description: >
+      Post-episodic annotation produced by RMS.
+      Episodic memory does not generate or modify this data.
+    optional: true
+    fields:
+      MAS: float
+      route:
+        enum: [normal_ep, filtered_ep, trauma]
+      intensity: 0.0-1.0
+      memory_color_ref: rms_color_vector_id
+      rms_version: string
+      timestamp: iso_8601
+
+  emotive_snapshot:
+    description: Emotive system state reference at episode time
+    fields:
+      E_matrix_9D: vector_reference
+      emotion_state: dominant_label
+
+  crosslinks:
+    description: Read-only references to other memory systems
+    fields:
+      semantic_refs: list_of_ids
+      sensory_refs: list_of_ids
+      gks_refs: list_of_ids
+      rms_refs: list_of_ids
+
+constraints:
+  - Episodic Memory must not perform admission or prioritization
+  - Episodic Memory must not promote knowledge
+  - Salience Anchors are candidates only
+  - Affective inference is never factual
+  - Speaker and source_type are mandatory
+  - Memory color is generated by RMS, not episodic
+  - MSP is the only system allowed to write storage layers
+
+intended_consumers:
+  - IRE (Integration / Reflection Engine)
+  - RMS (Regulation & Modulation System)
+  - MSP (Memory Storage Process)
+  - Consciousness Layer
+  - Meta-Learning Systems
+  - Human Audit / Debugging
+
+non_responsibilities:
+  - Decision making
+  - Knowledge promotion
+  - Policy enforcement
+  - Persona adjustment
+  - Truth validation
+
+versioning:
+  stability: production_archive_grade
+  backward_compatibility: episodic_v3.x
+  evolution_note: >
+    Future revisions may enrich trace annotations,
+    but must preserve the non-decision archival contract.

@@ -1,0 +1,120 @@
+schema: EVA-ESS-Output-v1
+version: 1.0
+updated: 2025-12-18
+
+name: ESS Output Specification
+owner: Emotive_Signaling_System
+role: physiological_state_and_telemetry_output
+
+description: >
+  Canonical output produced by ESS (Emotive Signaling System).
+  Represents embodied physiological state, reflex tendencies,
+  and kinetic telemetry in medically meaningful units.
+  This output may be consumed by internal EVA systems (limited)
+  and external monitoring/dashboard systems.
+
+# -------------------------------------------------------------------
+# OUTPUT STRUCTURE
+# -------------------------------------------------------------------
+
+output:
+  ess_id:
+    type: string
+    description: Unique identifier of ESS processing instance.
+
+  episode_id:
+    type: string
+    description: Episodic identifier used for memory linking.
+
+  stimulus_vector:
+    type: map
+    source: Linguistic_Perception_Layer
+    description: >
+      Normalized pre-linguistic stimulus signals received by ESS.
+    constraints:
+      key_space: STIMULUS_KEYS
+      value_range: [0.0, 1.0]
+
+  reflex_vector:
+    type: reflex_signal
+    description: >
+      Low-level physiological reflex tendencies.
+    fields:
+      urgency_load: { range: [0.0, 1.0] }
+      withdrawal: { range: [0.0, 1.0] }
+      social_warmth: { range: [0.0, 1.0] }
+      cognitive_drive: { range: [0.0, 1.0] }
+      threat_level: { range: [0.0, 1.0] }
+
+  kinetic_telemetry:
+    type: telemetry_block
+    usage: external_monitoring_only
+    description: >
+      Physiological kinetics and exposure telemetry.
+      Must never be used as input to psychological or memory logic.
+
+    fields:
+      dose_input:
+        type: chemical_map
+        unit: medical
+        description: >
+          ESC secretion generated during the current tick.
+
+      D_Remaining:
+        type: chemical_map
+        unit: medical
+        description: >
+          Current remaining concentration of ESCs (PK state).
+
+      D_Cumulative:
+        type: chemical_map
+        unit: medical_integral
+        description: >
+          Cumulative chronic exposure of ESCs over time.
+
+      time_tracking:
+        type: time_block
+        description: >
+          Temporal tracking of ESS operation and exposure duration.
+
+        fields:
+          tick:
+            type: integer
+          delta_t_sec:
+            type: number
+          exposure_duration_sec:
+            type: chemical_map
+
+# -------------------------------------------------------------------
+# CONSTRAINTS
+# -------------------------------------------------------------------
+
+constraints:
+  forbidden_semantics:
+    - emotion_label
+    - mood
+    - intent
+    - meaning
+    - narrative
+    - decision_signal
+
+  invariants:
+    - All chemical values must be in medically meaningful units.
+    - reflex_vector is the only behavioral output.
+    - kinetic_telemetry is read-only and external-facing.
+    - ESS must not write memory directly.
+
+# -------------------------------------------------------------------
+# CONSUMERS
+# -------------------------------------------------------------------
+
+consumers:
+  internal:
+    - EVA_Matrix (reflex_vector only)
+    - RMS (threat_level only)
+    - MSP (read-only ingestion)
+
+  external:
+    - Monitoring_Dashboard
+    - Audit_Logger
+    - Research_Analysis

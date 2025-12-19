@@ -1,0 +1,118 @@
+schema: EVA-GKS-Trigger-Rules-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: GKS
+role: >
+  Defines the conditions under which GKS may be consulted
+  or activated during runtime.
+  GKS is invoked only for identity-level or principle-level decisions.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - GKS is not consulted for routine interactions.
+  - GKS is triggered only by systemic, persistent, or paradoxical signals.
+  - Single events never trigger GKS.
+  - GKS provides guidance, not direct actions.
+
+# ==========================================================
+# VALID TRIGGER SOURCES
+# ==========================================================
+
+valid_trigger_sources:
+  - MSP
+  - Policy_Engine
+
+# ==========================================================
+# TRIGGER CONDITIONS
+# ==========================================================
+
+trigger_conditions:
+
+  identity_conflict:
+    description: >
+      Detected conflict between proposed behavior and EVA core principles.
+    signals:
+      - alignment_status == misaligned
+      - violation_of_master_block
+    severity: high
+
+  persistent_paradox:
+    description: >
+      Repeated unresolved semantic conflicts across episodes.
+    signals:
+      - unresolved_semantic_conflicts >= 3
+      - confidence_fluctuation_detected
+    severity: high
+
+  systemic_instability:
+    description: >
+      Sustained instability in EVA internal state across time.
+    signals:
+      - episodic_state_variance_high
+      - affective_instability_persistent
+    severity: medium
+
+  identity_evolution_candidate:
+    description: >
+      Emergent pattern suggests need for identity-level refinement.
+    signals:
+      - semantic_convergence_detected
+      - repeated_master_alignment_checks
+    severity: medium
+
+# ==========================================================
+# NON-TRIGGERS (EXPLICIT)
+# ==========================================================
+
+non_triggers:
+  - single_emotional_spike
+  - sensory_anomaly
+  - llm_uncertainty
+  - low_confidence_semantic
+  - normal_user_disagreement
+
+# ==========================================================
+# TRIGGER HANDLING
+# ==========================================================
+
+trigger_handling:
+
+  on_trigger:
+    actions:
+      - freeze_memory_promotion
+      - request_gks_evaluation
+      - annotate_context_with_trigger_reason
+
+  gks_response_handling:
+    - return_principle_guidance
+    - return_constraints
+    - no_direct_decision_execution
+
+# ==========================================================
+# ESCALATION RULES
+# ==========================================================
+
+escalation:
+
+  require_user_involvement_if:
+    - proposal_involves_identity_change
+    - master_block_modification_requested
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  log_all_triggers: true
+  log_trigger_source: true
+  log_trigger_outcome: true
+
+  audit_tags:
+    - gks_triggered
+    - identity_evaluation
+    - principle_guard

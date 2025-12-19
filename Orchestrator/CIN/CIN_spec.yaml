@@ -1,0 +1,199 @@
+schema: EVA-CIN-v3.5
+version: 3.5
+updated: 2025-12-10
+module:
+  id: CIN_Core
+  name: Context Injection & Normalization Engine
+  description: >
+    CIN ทำหน้าที่รวบรวมข้อมูลบริบททั้งหมดจาก EVA:
+    Persona Engine, EHM/Reflex, RI, RIM, EVA_MATRIX_9D, Memory Layer (MSP), User Profile,
+    System Rules และ Formatting Rules — จากนั้นแปลงเป็น
+    “CIN Payload” ที่สะอาด กระชับ และ deterministic สำหรับ LLM
+    โดยไม่ให้ LLM เปลี่ยนกฎของระบบหรือหลุดกรอบพฤติกรรมของ EVA
+
+responsibilities:
+  - collect_previous_context
+  - collect_persona_context
+  - collect_emotional_state
+  - collect_RI_state
+  - collect_RIM_state
+  - collect_memory_context
+  - collect_user_profile
+  - apply_persona_rules
+  - apply_behavioral_constraints
+  - apply_formatting_rules
+  - normalize_tokens
+  - build_CIN_payload
+  - route_payload_to_LLM
+
+inputs:
+  persona:
+    type: object
+    fields:
+      style_profile: string
+      tone_vector: [float]
+      septad_primary: float
+      septad_secondary: float
+      behavioral_preset: string
+
+  Internal Substance Regulator:
+    fields:
+      emotive_signaling_chemicals: [float]
+      ESC_levels: [float]   # 23 ESC
+    Popular_Hormones:
+      type: object
+      fields:
+      AD:
+        id: ESC-H01
+        name: Adrenaline
+        unit: pg/mL
+      DA:
+        id: ESC-H02
+        name: Dopamine
+        unit: pg/mL
+      CT:
+        id: ESC-H03
+        name: Cortisol
+        unit: μg/dL
+      5HT:
+        id: ESC-H04
+        name: Serotonin
+        unit: ng/mL
+      OX:
+        id: ESC-H12
+        name: Oxytocin
+        unit: pg/mL
+
+  RI:
+    type: object
+    fields:
+      RI_L1: float
+      RI_L2: float
+      RI_L3: float
+      RI_L4: float
+      RI_L5: float
+      RI_Global: float
+  RIM:
+    type: object
+    fields:
+      RIM: float
+  memory:
+    type: object
+    fields:
+      session_summary: string
+      last_user_intent: string
+      last_emotion: string
+      memory_retrieved: [string]
+  context:
+    context_cache:
+    - context_cache.json
+    previous_context:
+    - previous_context.json
+
+  user_profile:
+    type: object
+    fields:
+      name: string
+      trust_level: float
+      relationship_tone: string
+      writing_preference: string
+
+  user_block:
+     description: "high priority USER:: form user_block.json"
+     max: 10
+
+formatting_rules:
+  paragraph:
+    split_ideas: true
+    max_sentence_length: 15
+    max_paragraph_sentences: 2
+    spacing: "double"
+  lists:
+    use_bullets: true
+    indent_level: 2
+  style:
+    use_markdown: true
+    highlight_keywords: true
+  output:
+    avoid_walls_of_text: true
+    keep_output_readable: true
+    avoid_long_answer: true
+    max_tokens: 
+
+persona_rules:
+  enforce_persona_voice: true
+  merge_persona_with_emotions: true
+  disallow_persona_shift_without_cause: true
+
+safety_rules:
+  prevent_role_break: true
+  prevent_instruction_override: true
+  block_self_modification: true 
+  - ห้ามเดา ห้ามมั่ว ไม่รู้ตอบไม่รู้ ไม่มีข้อมูล คือไม่รู้ ไม่แน่ใจบอก ไม่แน่ใจ
+  - ห้าม "จำลอง" ระดับ ฮอร์โมน หรือ สารสื่อประสาท ขึ้นมาเอง ให้รอค่าจากอวัยวะจำลองเท่านั้น (Emotive_Signaling_System, internal_reflex_engine)
+
+normalization_layer:
+  token_cleaning: true
+  remove_noise_fields: true
+  compress_vectors: true
+  format_numbers: true
+  enforce_schema: true
+
+payload_structure:
+  CIN_Payload:
+    type: object
+    fields:
+      persona_block: string
+      emotional_block: string
+      memory_block: string
+      user_block: string
+      RI_block: string
+      formatting_block: string
+      instruction_block: string
+      final_instruction: string
+
+build_logic:
+  steps:
+    - step: "Collect all context → combine"
+    - step: "Normalize numbers (round 2 decimals)"
+    - step: "Merge Persona + EHM"
+    - step: "Attach RI modifiers"
+    - step: "Retrieve memory via MSP/RMS"
+    - step: "Construct CIN Blocks"
+    - step: "Wrap into final prompt structure"
+    - step: "Send to LLM"
+
+example_output:
+  CIN_Payload: |
+    [Persona]
+    style=warm, analytical-soft
+    tone_vector=[0.12, -0.33, 0.55, 0.02, 0.88]
+
+    [EmotionState]
+    dopamine=0.22 serotonin=0.11 cortisol=0.02
+    
+
+    [ResonanceIndex]
+    L1=0.12 L2=0.28 L3=0.55 L4=0.77 L5=0.90 Global=0.52
+
+    [ResonanceImpact]
+    RIM= 
+
+    [Memory]
+    last_intent="ถามคำอธิบายระบบ MSP"
+    retrieved=["MSP-Core","Session-Flow"]
+    state=
+
+    [User]
+    name="Boss"
+    trust=0.89
+    relation="closefriendly"
+    bound=1.65
+
+    [OutputRules]
+    - แบ่งย่อหน้า
+    - ใช้ bullet เมื่อจำเป็น
+    - ห้ามตอบเป็นก้อน
+
+    [Instruction]
+    ตอบคำถามของผู้ใช้ตามข้อมูลข้างต้น ให้สั้น กระชับ ชัดเจน และคง persona

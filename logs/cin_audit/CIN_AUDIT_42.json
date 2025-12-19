@@ -1,0 +1,11 @@
+{
+  "turn_id": 42,
+  "timestamp": "2025-12-19 08:52:02",
+  "audit_status": "pass",
+  "episode_count": 42,
+  "warnings": [],
+  "fatal_errors": [],
+  "fixes_applied": [],
+  "size_before": 4164,
+  "size_after": 4164
+}

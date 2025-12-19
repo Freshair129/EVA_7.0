@@ -1,0 +1,133 @@
+schema: EVA-GKS-Interface-Spec-v1
+version: 1.0
+updated: 2025-12-18
+
+owner: GKS
+role: >
+  Defines how internal EVA systems may interface with the
+  Genesis Knowledge System (GKS).
+  GKS is a read-only constitutional authority during runtime
+  and may only be modified via explicit governance protocols.
+
+# ==========================================================
+# CORE PRINCIPLES
+# ==========================================================
+
+principles:
+  - GKS is not memory and does not store events.
+  - GKS is not a state engine and does not track runtime values.
+  - GKS is read-only during normal operation.
+  - No LLM or sensory system may directly modify GKS.
+  - MSP acts as the sole gatekeeper for GKS access.
+
+# ==========================================================
+# ALLOWED CALLERS
+# ==========================================================
+
+allowed_callers:
+
+  MSP:
+    permissions:
+      - query_principle
+      - query_constraint
+      - evaluate_alignment
+      - request_trigger_evaluation
+
+  Policy_Engine:
+    permissions:
+      - query_protocol
+      - query_framework
+
+  Persona_Engine:
+    permissions:
+      - read_master_blocks
+      - read_genesis_blocks
+
+# ==========================================================
+# FORBIDDEN CALLERS
+# ==========================================================
+
+forbidden_callers:
+  - LLM
+  - Sensory_Layer
+  - ESS
+  - EVA_Matrix
+  - Reflex_Engine
+
+# ==========================================================
+# READ INTERFACE
+# ==========================================================
+
+read_interface:
+
+  query_types:
+
+    principle_query:
+      description: >
+        Retrieve core principles or constraints that guide EVA behavior.
+      allowed_blocks:
+        - Safety_Block
+        - Master_Block
+        - Genesis_Concept
+        - Genesis_Framework
+
+    protocol_query:
+      description: >
+        Retrieve procedural guidance for handling complex situations.
+      allowed_blocks:
+        - Genesis_Protocol
+        - Genesis_Algorithm
+
+    alignment_check:
+      description: >
+        Check whether a proposed action or interpretation
+        aligns with EVA’s core identity.
+      input:
+        - abstract_action_description
+        - context_summary
+      output:
+        - alignment_status: [aligned, neutral, misaligned]
+        - violated_principles (optional)
+
+# ==========================================================
+# WRITE / MODIFY INTERFACE (RESTRICTED)
+# ==========================================================
+
+write_interface:
+
+  allowed_modes:
+    - governance_update
+
+  governance_update:
+    description: >
+      Controlled update of GKS content.
+      Requires explicit user authorization and audit logging.
+    requirements:
+      - user_explicit_consent
+      - safety_block_clearance
+      - version_increment
+      - immutable_audit_log
+
+# ==========================================================
+# RESPONSE GUARANTEES
+# ==========================================================
+
+response_guarantees:
+  - deterministic
+  - context-independent
+  - no_side_effects
+  - no_runtime_state_dependency
+
+# ==========================================================
+# AUDIT & TRACEABILITY
+# ==========================================================
+
+audit:
+
+  log_all_queries: true
+  log_write_attempts: true
+
+  audit_tags:
+    - gks_read_only
+    - constitutional_access
+    - identity_guarded

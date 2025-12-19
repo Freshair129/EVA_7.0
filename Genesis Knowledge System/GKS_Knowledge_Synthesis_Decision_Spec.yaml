@@ -1,0 +1,126 @@
+schema: EVA-Knowledge-Synthesis-Decision-v1
+version: 1.0
+updated: 2025-12-18
+
+description: >
+  Defines deterministic decision logic for extracting, prioritizing,
+  and synthesizing knowledge from episodic interactions.
+  Emotion is used as a weighting signal, not a selector.
+
+core_principle:
+  - "Logic decides IF knowledge is eligible"
+  - "Emotion decides WHEN and HOW STRONGLY it is promoted"
+  - "No emotion-only synthesis is permitted"
+
+# ------------------------------------------------------------------
+# DECISION STACK (ORDER MATTERS)
+# ------------------------------------------------------------------
+decision_layers:
+
+  # ================================================================
+  # LAYER 1 — LOGICAL ELIGIBILITY (HARD GATE)
+  # ================================================================
+  logical_eligibility:
+    required_conditions:
+      - has_explicit_evidence: true
+      - has_reasoning_chain: true
+      - has_generalizable_pattern: true
+
+    disqualifiers:
+      - purely_emotional_expression
+      - venting_without_insight
+      - single_instance_without abstraction
+
+    output:
+      status: [eligible, rejected]
+      rejection_reason: string
+
+  # ================================================================
+  # LAYER 2 — SEMANTIC COHERENCE (STRUCTURAL GATE)
+  # ================================================================
+  semantic_coherence:
+    checks:
+      - consistency_with_existing_concepts
+      - non_conflict_with_genesis_block
+      - non_conflict_with_master_block
+      - fits_known_knowledge_type: [concept, algorithm, protocol, parameter]
+
+    outcomes:
+      - coherent
+      - episodic_only
+      - conflict_detected
+
+    conflict_policy:
+      action: "store_as_hypothesis"
+      confidence_penalty: 0.25
+
+  # ================================================================
+  # LAYER 3 — AFFECTIVE WEIGHTING (PRIORITY MODULATOR)
+  # ================================================================
+  affective_weighting:
+    source: ESS / EVA Matrix / ees_output
+
+    required_metrics:
+      confidence_min: 0.75
+
+    emotion_types_with_weight:
+      realization_clarity: 1.0
+      surprise_optimization: 0.9
+      urgency_focused: 0.85
+      fear_controlled: 0.7
+      panic: 0.0
+
+    modifiers:
+      arousal_high_bonus: 0.1
+      dominance_high_bonus: 0.1
+      instability_penalty: -0.2
+
+    output:
+      synthesis_priority:
+        - deferred
+        - normal
+        - high
+        - prime
+
+  # ================================================================
+  # LAYER 4 — VALIDATION & STABILIZATION
+  # ================================================================
+  validation:
+    signals:
+      - repeated_occurrence
+      - cross_session_confirmation
+      - human_confirmation
+
+    promotion_thresholds:
+      semantic_memory: 0.80
+      algorithm_or_protocol: 0.85
+      genesis_candidate: 0.95
+
+    stability_rule:
+      minimum_time_window: "multiple sessions"
+      forbid_panic_state_commit: true
+
+# ------------------------------------------------------------------
+# SYNTHESIS OUTPUT TYPES
+# ------------------------------------------------------------------
+knowledge_outputs:
+  allowed:
+    - concept
+    - algorithm
+    - protocol
+    - parameter
+    - heuristic
+
+  forbidden:
+    - identity_law_without_long_term_stability
+    - emotion_only_rule
+    - single_event_generalization
+
+# ------------------------------------------------------------------
+# SAFETY GUARANTEES
+# ------------------------------------------------------------------
+safety_constraints:
+  - no_genesis_write_without_governance
+  - no_master_promotion_from_emotional_peak
+  - all_synthesis_must_reference_episodic_ids
+

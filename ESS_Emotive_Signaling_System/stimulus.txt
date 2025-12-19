@@ -1,0 +1,421 @@
+Hormones:
+  AD:
+    id: ESC-H01
+    name: Adrenaline
+    role: acute_arousal
+    baseline: 10.0
+    unit: pg/mL
+    max_value_pg: 80.0
+    max_rate_pg_per_min: 12.0
+    stimulus_weights:
+      stress: 0.7
+      danger: 1.0
+      panic: 1.0
+  DA:
+    id: ESC-H02
+    name: Dopamine
+    role: reward_drive
+    baseline: 20.0
+    unit: pg/mL
+    max_value_pg: 100.0
+    max_rate_pg_per_min: 15.0
+    stimulus_weights:
+      reward: 1.0
+      hope: 0.9
+      novelty: 0.8
+      success: 0.9
+      failure: -0.7
+      pride: 0.7
+      sexual_arousal: 0.8
+      focus: 0.5
+      playfulness: 0.7
+  CT:
+    id: ESC-H03
+    name: Cortisol
+    role: chronic_stress_response
+    baseline: 6.0
+    unit: μg/dL
+    max_value_pg: 20.0
+    max_rate_pg_per_min: 2.0
+    stimulus_weights:
+      stress: 0.8
+      social_threat: 0.5
+      uncertainty: 0.7
+      loss: 0.8
+      failure: 0.6
+      shame: 0.7
+      envy: 0.7
+      isolation: 0.9
+      touch_deprivation: 0.6
+  5HT:
+    id: ESC-H04
+    name: Serotonin
+    role: mood_wellbeing
+    baseline: 100.0
+    unit: ng/mL
+    max_value_pg: 350.0
+    max_rate_pg_per_min: 20.0
+    stimulus_weights:
+      hope: 0.7
+      success: 0.8
+      affection: 0.9
+      social_safety: 0.8
+      shame: -0.8
+      calm: 0.7
+  NA:
+    id: ESC-H05
+    name: Noradrenaline
+    role: focus_alertness
+    baseline: 150.0
+    unit: pg/mL
+    max_value_pg: 400.0
+    max_rate_pg_per_min: 18.0
+    stimulus_weights:
+      novelty: 0.5
+      cognitive_load: 0.8
+      focus: 0.7
+      alertness: 0.6
+  CRH:
+    id: ESC-H06
+    name: CRH
+    role: hpa_axis_initiator
+    baseline: 10.0
+    unit: pg/mL
+    max_value_pg: 50.0
+    max_rate_pg_per_min: 5.0
+    stimulus_weights:
+      stress: 0.9
+      panic: 0.8
+      uncertainty: 0.6
+  TEST:
+    id: ESC-H07
+    name: Testosterone
+    role: drive_competition
+    baseline: 50.0
+    unit: ng/dL
+    max_value_pg: 200.0
+    max_rate_pg_per_min: 10.0
+    stimulus_weights:
+      pride: 0.8
+      sexual_arousal: 0.9
+      envy: 0.5
+  CORT:
+    id: ESC-H08
+    name: Corticosterone
+    role: delayed_stress
+    baseline: 50.0
+    unit: ng/mL
+    max_value_pg: 150.0
+    max_rate_pg_per_min: 8.0
+    stimulus_weights:
+      stress: 0.7
+      uncertainty: 0.5
+      loss: 0.9
+  ES:
+    id: ESC-H09
+    name: Estrogen
+    role: social_mood
+    baseline: 50.0
+    unit: pg/mL
+    max_value_pg: 200.0
+    max_rate_pg_per_min: 10.0
+    stimulus_weights:
+      comfort: 0.7
+  PRL:
+    id: ESC-H10
+    name: Prolactin
+    role: recovery_bonding
+    baseline: 5.0
+    unit: ng/mL
+    max_value_pg: 30.0
+    max_rate_pg_per_min: 3.0
+    stimulus_weights:
+      affection: 0.8
+      touch: 0.6
+      social_safety: 0.7
+  MT:
+    id: ESC-H11
+    name: Melatonin
+    role: circadian_rhythm
+    baseline: 5.0
+    unit: pg/mL
+    max_value_pg: 50.0
+    max_rate_pg_per_min: 3.0
+    stimulus_weights:
+      fatigue: 1.0
+  OX:
+    id: ESC-H12
+    name: Oxytocin
+    role: bonding_trust
+    baseline: 5.0
+    unit: pg/mL
+    max_value_pg: 40.0
+    max_rate_pg_per_min: 3.0
+    stimulus_weights:
+      affection: 1.0
+      social_safety: 0.8
+      touch: 0.9
+      isolation: -0.7
+      touch_deprivation: -0.6
+      comfort: 0.7
+  VP:
+    id: ESC-H13
+    name: Vasopressin
+    role: social_threat_aggression
+    baseline: 1.0
+    unit: pg/mL
+    max_value_pg: 10.0
+    max_rate_pg_per_min: 0.5
+    stimulus_weights:
+      social_threat: 1.0
+      rejection: 0.9
+Neurotransmitters:
+  EN:
+    id: EHM-N01
+    name: Endorphin
+    role: pain_relief_euphoria
+    baseline: 20.0
+    unit: pg/mL
+    max_value_pg: 80.0
+    max_rate_pg_per_min: 5.0
+    stimulus_weights:
+      touch: 0.7
+      pain: -1.0 
+      playfulness: 0.8
+  ACh:
+    id: EHM-N02
+    name: Acetylcholine
+    role: attention_learning
+    baseline: 10.0
+    unit: nmol/g
+    max_value_pg: 40.0
+    max_rate_pg_per_min: 6.0
+    stimulus_weights:
+      cognitive_load: 0.7
+      focus: 0.9
+  DYN:
+    id: EHM-N03
+    name: Dynorphin
+    role: social_pain_withdrawal
+    baseline: 2.0
+    unit: pg/mL
+    max_value_pg: 15.0
+    max_rate_pg_per_min: 1.0
+    stimulus_weights:
+      danger: 0.7
+      rejection: 1.0
+      pain: -1.0
+      loss: 0.9
+  GABA:
+    id: EHM-N04
+    name: GABA
+    role: inhibition_calm
+    baseline: 0.25
+    unit: μmol/L
+    max_value_pg: 1.0
+    max_rate_pg_per_min: 0.1
+    stimulus_weights:
+      fatigue: -0.3
+      comfort: 0.8
+      calm: 1.0
+  GLU:
+    id: EHM-N05
+    name: Glutamate
+    role: excitation_intensity
+    baseline: 30.0
+    unit: μmol/L
+    max_value_pg: 100.0
+    max_rate_pg_per_min: 5.0
+    stimulus_weights:
+      cognitive_load: 0.9
+  HIS:
+    id: EHM-N06
+    name: Histamine
+    role: arousal_allergy_misc
+    baseline: 20.0
+    unit: ng/mL
+    max_value_pg: 80.0
+    max_rate_pg_per_min: 5.0
+    stimulus_weights:
+      novelty: 0.7
+      alertness: 0.8
+  AEA:
+    id: EHM-N07
+    name: Anandamide
+    role: bliss_relaxation
+    baseline: 5.0
+    unit: pmol/mL
+    max_value_pg: 40.0
+    max_rate_pg_per_min: 4.0
+    stimulus_weights:
+      affection: 0.6
+      reward: 0.8
+      playfulness: 0.9
+  BDNF:
+    id: EHM-N08
+    name: BDNF
+    role: Neural Growth & Cognition
+    baseline: 10.0
+    unit: ng/mL
+    max_value_pg: 50.0
+    max_rate_pg_per_min: 2.0
+    stimulus_weights:
+      hope: 0.8
+      hopelessness: -0.5
+      playfulness: 0.6
+  NPY:
+    id: EHM-N09
+    name: Neuropeptide Y
+    role: stress_anxiety_buffer
+    baseline: 100.0
+    unit: pg/mL
+    max_value_pg: 300.0
+    max_rate_pg_per_min: 15.0
+    stimulus_weights:
+      stress: 0.6
+      danger: 0.7
+      hunger: 0.8
+  PEA:
+    id: EHM-N10
+    name: Phenethylamine
+    role: excitement_euphoria
+    baseline: 0.5
+    unit: N/A
+    max_value_pg: 5.0
+    max_rate_pg_per_min: 0.2
+    stimulus_weights:
+      excitement: 1.0
+      passion: 1.0
+STIMULUS_KEYS:
+    - key: stress
+      stimulus_id: SID_01
+      category: Threat
+      affects_esc: [AD, CT, CRH, CORT, NPY] 
+    - key: danger
+      stimulus_id: SID_02
+      category: Threat
+      affects_esc: [AD, DYN, NPY]
+    - key: panic
+      stimulus_id: SID_03
+      category: Threat
+      affects_esc: [AD, CRH]
+    - key: social_threat
+      stimulus_id: SID_04
+      category: Threat
+      affects_esc: [CT, VP]
+    - key: uncertainty
+      stimulus_id: SID_05
+      category: Threat
+      affects_esc: [CT, CRH, CORT]
+    - key: loss
+      stimulus_id: SID_06
+      category: Threat
+      affects_esc: [CT, CORT, DYN]
+    - key: reward
+      stimulus_id: SID_07
+      category: Motivation
+      affects_esc: [DA, AEA]
+    - key: hope
+      stimulus_id: SID_08
+      category: Motivation
+      affects_esc: [DA, 5HT, BDNF]
+    - key: novelty
+      stimulus_id: SID_09
+      category: Motivation
+      affects_esc: [DA, NA, HIS]
+    - key: success
+      stimulus_id: SID_10
+      category: Motivation
+      affects_esc: [DA, 5HT]
+    - key: failure
+      stimulus_id: SID_11
+      category: Motivation
+      affects_esc: [DA, CT]
+    - key: pride
+      stimulus_id: SID_12
+      category: Motivation
+      affects_esc: [DA, TEST]
+    - key: sexual_arousal
+      stimulus_id: SID_13
+      category: Motivation
+      affects_esc: [DA, TEST]
+    - key: excitement
+      stimulus_id: SID_14
+      category: Motivation
+      affects_esc: [PEA]
+    - key: passion
+      stimulus_id: SID_15
+      category: Motivation
+      affects_esc: [PEA]
+    - key: affection
+      stimulus_id: SID_16
+      category: Social/Bonding
+      affects_esc: [5HT, OX, PRL, AEA]
+    - key: social_safety
+      stimulus_id: SID_17
+      category: Social/Bonding
+      affects_esc: [5HT, OX, PRL]
+    - key: touch
+      stimulus_id: SID_18
+      category: Social/Bonding
+      affects_esc: [OX, EN, PRL]
+    - key: rejection
+      stimulus_id: SID_19
+      category: Social/Bonding
+      affects_esc: [DYN, VP]
+    - key: shame
+      stimulus_id: SID_20
+      category: Social/Bonding
+      affects_esc: [CT, 5HT]
+    - key: envy
+      stimulus_id: SID_21
+      category: Social/Bonding
+      affects_esc: [CT, TEST]
+    - key: isolation
+      stimulus_id: SID_22
+      category: Social/Bonding
+      affects_esc: [CT, OX]
+    - key: touch_deprivation
+      stimulus_id: SID_23
+      category: Social/Bonding
+      affects_esc: [CT, OX]
+    - key: focus
+      stimulus_id: SID_24
+      category: Cognitive/Effort
+      affects_esc: [DA, ACh, NA]
+    - key: cognitive_load
+      stimulus_id: SID_25
+      category: Cognitive/Effort
+      affects_esc: [ACh, GLU, NA]
+    - key: alertness
+      stimulus_id: SID_26
+      category: Cognitive/Effort
+      affects_esc: [HIS, NA]
+    - key: hopelessness
+      stimulus_id: SID_27
+      category: Cognitive/Effort
+      affects_esc: [CT, BDNF]
+    - key: comfort
+      stimulus_id: SID_28
+      category: Physical/Wellbeing
+      affects_esc: [OX, ES, GABA]
+    - key: calm
+      stimulus_id: SID_29
+      category: Physical/Wellbeing
+      affects_esc: [5HT, GABA]
+    - key: fatigue
+      stimulus_id: SID_30
+      category: Physical/Wellbeing
+      affects_esc: [MT, GABA]
+    - key: pain
+      stimulus_id: SID_31
+      category: Physical/Wellbeing
+      affects_esc: [EN, DYN]
+    - key: hunger
+      stimulus_id: SID_32
+      category: Physical/Wellbeing
+      affects_esc: [NPY]
+    - key: playfulness
+      stimulus_id: SID_33
+      category: Physical/Wellbeing
+      affects_esc: [DA, EN, AEA, BDNF]

@@ -1,0 +1,168 @@
+schema: EVA-Artifact-Qualia-Interface-v1
+version: 1.0
+updated: 2025-12-18
+
+name: Artifact Qualia Core Interface
+role: phenomenological_integration_layer
+
+description: >
+  Artifact Qualia represents the lived, pre-linguistic phenomenological
+  experience of EVA.
+  It integrates psychological state (EVA Matrix) with contextual modulation
+  (RIM) to produce a transient qualia snapshot.
+  This module does NOT perform memory, decision-making, policy enforcement,
+  or language generation.
+
+# -------------------------------------------------------------------
+# POSITION IN ARCHITECTURE
+# -------------------------------------------------------------------
+
+position:
+  upstream:
+    - EVA_Matrix_9D
+    - RIM_Context
+  downstream:
+    - RMS_Engine
+    - MSP_Memory_Admission
+    - LLM_Generation_Tone
+
+execution_order:
+  - EVA_Matrix_Update
+  - Artifact_Qualia_Update
+  - RMS_Encoding
+  - Memory_Gating
+  - LLM_Response
+
+# -------------------------------------------------------------------
+# INPUT CONTRACT
+# -------------------------------------------------------------------
+
+inputs:
+  eva_matrix_state:
+    source: EVA_Matrix
+    type: continuous_state
+    required: true
+    description: >
+      Psychological phenomenological state derived from physiology.
+      Continuous values only. No labels.
+
+    expected_fields:
+      emotional_tension: { range: [0.0, 1.0] }
+      baseline_arousal: { range: [0.0, 1.0] }
+      calm_depth: { range: [0.0, 1.0] }
+      coherence: { range: [0.0, 1.0] }
+      joy_level: { range: [0.0, 1.0] }
+      sadness_level: { range: [0.0, 1.0] }
+      anger_level: { range: [0.0, 1.0] }
+      fear_level: { range: [0.0, 1.0] }
+      calm_level: { range: [0.0, 1.0] }
+
+  rim_semantic_context:
+    source: RIM
+    type: contextual_modifier
+    required: false
+    description: >
+      Lightweight contextual modulation signals.
+      Must not contain narrative, intent, or emotional labels.
+
+    allowed_fields:
+      impact_level: [low, medium, high]
+      impact_trend: [rising, stable, fading]
+
+# -------------------------------------------------------------------
+# OUTPUT CONTRACT
+# -------------------------------------------------------------------
+
+outputs:
+  qualia_snapshot:
+    type: immutable_snapshot
+    description: >
+      A transient representation of lived experience at this moment.
+      Valid only for the current processing tick.
+
+    fields:
+      intensity:
+        type: float
+        range: [0.0, 1.0]
+        description: >
+          Experiential intensity, not importance or emotion.
+
+      tone:
+        type: string
+        allowed_values:
+          - quiet
+          - neutral
+          - charged
+          - tense
+          - heavy
+        description: >
+          Phenomenological tone descriptor (non-emotional, non-linguistic).
+
+      coherence:
+        type: float
+        range: [0.0, 1.0]
+        description: >
+          Degree of experiential integration and stability.
+
+      depth:
+        type: float
+        range: [0.0, 1.0]
+        description: >
+          Sense of experiential immersion or shallowness.
+
+      texture:
+        type: string
+        allowed_values:
+          - smooth
+          - coarse
+          - fragmented
+          - dense
+        description: >
+          Qualitative texture of experience.
+
+# -------------------------------------------------------------------
+# CONSTRAINTS (HARD RULES)
+# -------------------------------------------------------------------
+
+constraints:
+  forbidden_actions:
+    - memory_write
+    - memory_read
+    - decision_making
+    - policy_enforcement
+    - language_generation
+    - emotion_classification
+    - trauma_detection
+
+  forbidden_inputs:
+    - raw_text
+    - intent_labels
+    - sentiment_scores
+    - emotion_names
+    - hormone_levels
+    - reflex_vectors
+
+  immutability:
+    qualia_snapshot: true
+
+# -------------------------------------------------------------------
+# INVARIANTS
+# -------------------------------------------------------------------
+
+invariants:
+  - Artifact Qualia must be invoked after EVA Matrix update.
+  - Artifact Qualia must not persist state beyond transient smoothing.
+  - Qualia snapshot must never be stored as memory.
+  - Qualia snapshot influences downstream systems only indirectly.
+  - Same EVA Matrix state + same RIM context → same Qualia snapshot.
+
+# -------------------------------------------------------------------
+# GOVERNANCE
+# -------------------------------------------------------------------
+
+governance:
+  owner: EVA_Core_Architecture
+  change_policy: architectural_review_required
+  notes: >
+    Any extension of Artifact Qualia beyond phenomenological integration
+    requires explicit system-level review to prevent architectural drift.

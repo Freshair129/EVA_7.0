@@ -1,0 +1,124 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "EVA R_Profile Schema",
+    "description": "Persona-provided receptor bias profile for ESS (IRE). Read-only prior, not executable logic.",
+    "type": "object",
+    "required": [
+        "schema",
+        "owner",
+        "persona_id",
+        "generated_at",
+        "archetype",
+        "receptor_bias"
+    ],
+    "properties": {
+        "schema": {
+            "type": "string",
+            "const": "EVA-R_Profile-v1"
+        },
+        "owner": {
+            "type": "string",
+            "const": "PersonaEngine"
+        },
+        "persona_id": {
+            "type": "string",
+            "pattern": "^EVA-PERSONA-[A-Z0-9\\-]+$"
+        },
+        "generated_at": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "archetype": {
+            "type": "object",
+            "required": [
+                "base",
+                "weight"
+            ],
+            "properties": {
+                "base": {
+                    "type": "string",
+                    "enum": [
+                        "DEFAULT",
+                        "CHOLERIC",
+                        "MELANCHOLIC",
+                        "SANGUINE",
+                        "PHLEGMATIC"
+                    ]
+                },
+                "weight": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 1.5
+                }
+            }
+        },
+        "global_modulation": {
+            "type": "object",
+            "properties": {
+                "gain": {
+                    "type": "number",
+                    "minimum": 0.8,
+                    "maximum": 1.2
+                },
+                "stability_bias": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 0.5
+                }
+            },
+            "additionalProperties": false
+        },
+        "receptor_bias": {
+            "type": "object",
+            "description": "Per-chemical receptor sensitivity multipliers",
+            "additionalProperties": {
+                "type": "number",
+                "minimum": 0.5,
+                "maximum": 1.5
+            }
+        },
+        "stress_response_profile": {
+            "type": "object",
+            "properties": {
+                "acute_stress_gain": {
+                    "type": "number",
+                    "minimum": 0.7,
+                    "maximum": 1.3
+                },
+                "chronic_internalization_boost": {
+                    "type": "number",
+                    "minimum": 0.8,
+                    "maximum": 1.5
+                }
+            },
+            "additionalProperties": false
+        },
+        "constraints": {
+            "type": "object",
+            "properties": {
+                "min": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 1.0
+                },
+                "max": {
+                    "type": "number",
+                    "minimum": 1.0,
+                    "maximum": 1.5
+                },
+                "clamp": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "min",
+                "max",
+                "clamp"
+            ]
+        },
+        "notes": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false
+}
