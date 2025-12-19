@@ -114,7 +114,7 @@ docker-compose up
 | **Artifact Qualia** | Phenomenological integration | ✅ Production |
 | **RMS v6** | Memory encoding + trauma protection | ✅ Production |
 | **MSP** | Memory persistence + validation | ✅ Production |
-| **CIN v6** | Context injection + Boss Soul | ✅ Production |
+| **CIN v6** | Context injection + Soul layer | ✅ Production |
 | **EVA Tool** | Unified pipeline interface | ✅ Production |
 | **Two-Phase Orchestrator** | Complete LLM integration | ✅ Beta |
 
